@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader
 from layers import transformation_from_parameters
 from utils import readlines
 from options import MonodepthOptions
-from datasets import KITTIOdomDataset
+from datasets import UrbanDataset
 import networks
 
 
@@ -57,15 +57,14 @@ def evaluate(opt):
         "eval_split should be either odom_9 or odom_10"
     '''
 
-    sequence_id = int(opt.eval_split.split("_")[1])
+    sequence_id = opt.eval_split
 
     filenames = readlines(
         os.path.join(os.path.dirname(__file__), "splits", "odom",
-                     "test_files_{:02d}.txt".format(sequence_id)))
+                     "test_files_{}.txt".format(sequence_id)))
 
-    img_ext = '.png' if opt.png else '.jpg'
-    dataset = KITTIOdomDataset(opt.data_path, filenames, opt.height, opt.width,
-                               [0, 1], 4, is_train=False, img_ext=img_ext)
+    dataset = UrbanDataset(opt.data_path, filenames, opt.height, opt.width,
+                               [0, 1], 4, is_train=False, img_ext='.png')
     dataloader = DataLoader(dataset, opt.batch_size, shuffle=False,
                             num_workers=opt.num_workers, pin_memory=True, drop_last=False)
 
@@ -88,9 +87,7 @@ def evaluate(opt):
     pose_decoder.eval()
 
     pred_poses = []
-    ii = 0
-    time_list = []
-    starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+
     print("-> Computing pose predictions")
 
     opt.frame_ids = [0, 1]  # pose network only takes two frames as input
@@ -103,21 +100,14 @@ def evaluate(opt):
             all_color_aug = torch.cat([inputs[("color_aug", i, 0)] for i in opt.frame_ids], 1)
 
             features = [pose_encoder(all_color_aug)]
-            starter.record()
             axisangle, translation = pose_decoder(features)
-            ender.record()
-            torch.cuda.synchronize()
-            time_list.append(starter.elapsed_time(ender)*0.001) 
 
             pred_poses.append(
                 transformation_from_parameters(axisangle[:, 0], translation[:, 0]).cpu().numpy())
-            ii+=1
-
-    print("\n  Inference time: {:0.4f}\n".format(np.sum(time_list)/ii))
 
     pred_poses = np.concatenate(pred_poses)
 
-    gt_poses_path = os.path.join(opt.data_path, "poses", "{:02d}.txt".format(sequence_id))
+    gt_poses_path = os.path.join(opt.data_path, "poses", "{}.txt".format(sequence_id))
     gt_global_poses = np.loadtxt(gt_poses_path).reshape(-1, 3, 4)
     gt_global_poses = np.concatenate(
         (gt_global_poses, np.zeros((gt_global_poses.shape[0], 1, 4))), 1)
@@ -140,7 +130,7 @@ def evaluate(opt):
 
     print("\n   Trajectory error: {:0.3f}, std: {:0.3f}\n".format(np.mean(ates), np.std(ates)))
 
-    save_path = os.path.join(opt.load_weights_folder, "{:02d}.npy".format(sequence_id))
+    save_path = os.path.join(opt.load_weights_folder, "{}.npy".format(sequence_id))
     np.save(save_path, pred_poses)
     print("-> Predictions saved to", save_path)
 

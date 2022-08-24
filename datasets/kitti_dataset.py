@@ -132,3 +132,17 @@ class KITTIDepthDataset(KITTIDataset):
             depth_gt = np.fliplr(depth_gt)
 
         return depth_gt
+
+class UrbanDataset(KITTIDataset):
+    """Complex Urban dataset for odometry training and testing
+    """
+    def __init__(self, *args, **kwargs):
+        super(UrbanDataset, self).__init__(*args, **kwargs)
+
+    def get_image_path(self, folder, frame_index, side):
+        f_str = "{:06d}{}".format(frame_index, self.img_ext)
+        image_path = os.path.join(
+            self.data_path,
+            "sequences/{}".format(folder),
+            f_str)
+        return image_path

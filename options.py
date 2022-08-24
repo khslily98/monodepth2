@@ -183,7 +183,11 @@ class MonodepthOptions:
                                  type=str,
                                  default="eigen",
                                  choices=[
-                                    "eigen", "eigen_benchmark", "benchmark", "odom_9", "odom_10"],
+                                    "eigen", "eigen_benchmark", "benchmark", 
+                                    "odom_0", "odom_3", "odom_4", "odom_5", "odom_7", "odom_9", "odom_10", 
+                                    "urban26_1", "urban26_2", "urban30_1", "urban30_2", "urban30_3", "urban32_1", 
+                                    "urban32_2", "urban32_2_1", "urban32_2_2", "urban32_3", "urban27_1", "urban27_2", "urban27_3", "urban27_4",
+                                    "urban34_1", "urban34_2", "urban34_3"],
                                  help="which split to run eval on")
         self.parser.add_argument("--save_pred_disps",
                                  help="if set saves predicted disparities",

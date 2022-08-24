@@ -79,10 +79,10 @@ def evaluate(opt):
         decoder_path = os.path.join(opt.load_weights_folder, "depth.pth")
 
         encoder_dict = torch.load(encoder_path)
-
+        img_ext = '.png' if opt.png else '.jpg'
         dataset = datasets.KITTIRAWDataset(opt.data_path, filenames,
                                            encoder_dict['height'], encoder_dict['width'],
-                                           [0], 4, is_train=False)
+                                           [0], 4, is_train=False, img_ext=img_ext)
         dataloader = DataLoader(dataset, 16, shuffle=False, num_workers=opt.num_workers,
                                 pin_memory=True, drop_last=False)
 
@@ -93,13 +93,19 @@ def evaluate(opt):
         encoder.load_state_dict({k: v for k, v in encoder_dict.items() if k in model_dict})
         depth_decoder.load_state_dict(torch.load(decoder_path))
 
+        num_dec = np.sum([p.numel() for p in depth_decoder.parameters()])
+        num_enc = np.sum([p.numel() for p in encoder.parameters()])
+        print(f"num_dec: {num_dec/1000000}M, num_enc: {num_enc/1000000}M")
+
         encoder.cuda()
         encoder.eval()
         depth_decoder.cuda()
         depth_decoder.eval()
 
+        ii = 0
         pred_disps = []
-
+        time_list = []
+        starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
         print("-> Computing predictions with size {}x{}".format(
             encoder_dict['width'], encoder_dict['height']))
 
@@ -111,7 +117,12 @@ def evaluate(opt):
                     # Post-processed results require each image to have two forward passes
                     input_color = torch.cat((input_color, torch.flip(input_color, [3])), 0)
 
-                output = depth_decoder(encoder(input_color))
+                starter.record()
+                feat = encoder(input_color)
+                output = depth_decoder(feat)
+                ender.record()
+                torch.cuda.synchronize()
+                time_list.append(starter.elapsed_time(ender)*0.001)
 
                 pred_disp, _ = disp_to_depth(output[("disp", 0)], opt.min_depth, opt.max_depth)
                 pred_disp = pred_disp.cpu()[:, 0].numpy()
@@ -121,7 +132,9 @@ def evaluate(opt):
                     pred_disp = batch_post_process_disparity(pred_disp[:N], pred_disp[N:, :, ::-1])
 
                 pred_disps.append(pred_disp)
+                ii+=1
 
+        print("\n  Inference time: {:0.4f}\n".format(np.sum(time_list)/ii))
         pred_disps = np.concatenate(pred_disps)
 
     else:
@@ -222,6 +235,7 @@ def evaluate(opt):
 
     print("\n  " + ("{:>8} | " * 7).format("abs_rel", "sq_rel", "rmse", "rmse_log", "a1", "a2", "a3"))
     print(("&{: 8.3f}  " * 7).format(*mean_errors.tolist()) + "\\\\")
+    print(("{:.3f},"* 7).format(*mean_errors.tolist()))
     print("\n-> Done!")
 
 
