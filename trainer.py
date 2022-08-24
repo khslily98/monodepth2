@@ -72,9 +72,10 @@ class Trainer:
                 self.parameters_to_train += list(self.models["pose_encoder"].parameters())
 
                 self.models["pose"] = networks.PoseDecoder(
-                    self.models["pose_encoder"].num_ch_enc,
-                    num_input_features=1,
-                    num_frames_to_predict_for=2)
+                    self.models["pose_encoder"].num_ch_enc, 1,
+                    self.opt.deformable_conv,
+                    self.opt.uncertainty_input,
+                    num_frames_to_predict_for=1)
 
             elif self.opt.pose_model_type == "shared":
                 self.models["pose"] = networks.PoseDecoder(
@@ -82,6 +83,8 @@ class Trainer:
 
             elif self.opt.pose_model_type == "posecnn":
                 self.models["pose"] = networks.PoseCNN(
+                    self.opt.deformable_conv,
+                    self.opt.uncertainty_input,
                     self.num_input_frames if self.opt.pose_model_input == "all" else 2)
 
             self.models["pose"].to(self.device)
@@ -245,21 +248,32 @@ class Trainer:
             outputs = self.models["depth"](features[0])
         else:
             # Otherwise, we only feed the image with frame_id 0 through the depth encoder
-            features = self.models["encoder"](inputs["color_aug", 0, 0])
+            input_color = inputs[("color_aug", 0, 0)]
+            if self.opt.uncertainty_input:
+                input_color = torch.cat((input_color, torch.flip(input_color, [3])), 0)
+            features = self.models["encoder"](input_color)
             outputs = self.models["depth"](features)
+
+            if self.opt.uncertainty_input:    
+                N = self.opt.batch_size
+                for s in self.opt.scales:
+                    outputs[('disp', s)], disp_rev = outputs[('disp', s)][:N], torch.flip(outputs[('disp', s)][N:], [3])
+                    with torch.no_grad():
+                        outputs[('uncert', s)] = torch.abs(outputs[('disp', s)] - disp_rev)
+            uncertainty = [outputs[('uncert', s)] for s in self.opt.scales] if self.opt.uncertainty_input else None
 
         if self.opt.predictive_mask:
             outputs["predictive_mask"] = self.models["predictive_mask"](features)
 
         if self.use_pose_net:
-            outputs.update(self.predict_poses(inputs, features))
+            outputs.update(self.predict_poses(inputs, features, uncertainty))
 
         self.generate_images_pred(inputs, outputs)
         losses = self.compute_losses(inputs, outputs)
 
         return outputs, losses
 
-    def predict_poses(self, inputs, features):
+    def predict_poses(self, inputs, features, uncertainty):
         """Predict poses between input frames for monocular sequences.
         """
         outputs = {}
@@ -286,7 +300,7 @@ class Trainer:
                     elif self.opt.pose_model_type == "posecnn":
                         pose_inputs = torch.cat(pose_inputs, 1)
 
-                    axisangle, translation = self.models["pose"](pose_inputs)
+                    axisangle, translation = self.models["pose"](pose_inputs, uncertainty)
                     outputs[("axisangle", 0, f_i)] = axisangle
                     outputs[("translation", 0, f_i)] = translation
 
@@ -558,6 +572,11 @@ class Trainer:
                 writer.add_image(
                     "disp_{}/{}".format(s, j),
                     normalize_image(outputs[("disp", s)][j]), self.step)
+                
+                if self.opt.uncertainty_input:
+                    writer.add_image(
+                        "uncert_{}/{}".format(s, j),
+                        normalize_image(outputs[("uncert", s)][j]), self.step)
 
                 if self.opt.predictive_mask:
                     for f_idx, frame_id in enumerate(self.opt.frame_ids[1:]):

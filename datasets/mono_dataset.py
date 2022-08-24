@@ -15,6 +15,7 @@ from PIL import Image  # using pillow-simd for increased speed
 import torch
 import torch.utils.data as data
 from torchvision import transforms
+import torchvision.transforms.functional as TF
 
 
 def pil_loader(path):
@@ -64,20 +65,11 @@ class MonoDataset(data.Dataset):
         self.loader = pil_loader
         self.to_tensor = transforms.ToTensor()
 
-        # We need to specify augmentations differently in newer versions of torchvision.
-        # We first try the newer tuple version; if this fails we fall back to scalars
-        try:
-            self.brightness = (0.8, 1.2)
-            self.contrast = (0.8, 1.2)
-            self.saturation = (0.8, 1.2)
-            self.hue = (-0.1, 0.1)
-            transforms.ColorJitter.get_params(
-                self.brightness, self.contrast, self.saturation, self.hue)
-        except TypeError:
-            self.brightness = 0.2
-            self.contrast = 0.2
-            self.saturation = 0.2
-            self.hue = 0.1
+        self.brightness = (0.8, 1.2)
+        self.contrast = (0.8, 1.2)
+        self.saturation = (0.8, 1.2)
+        self.hue = (-0.1, 0.1)
+        self.color_jitter = [TF.adjust_brightness, TF.adjust_contrast, TF.adjust_saturation, TF.adjust_hue]
 
         self.resize = {}
         for i in range(self.num_scales):
@@ -106,7 +98,12 @@ class MonoDataset(data.Dataset):
             if "color" in k:
                 n, im, i = k
                 inputs[(n, im, i)] = self.to_tensor(f)
-                inputs[(n + "_aug", im, i)] = self.to_tensor(color_aug(f))
+                if type(color_aug) is list:
+                    for aug, param in color_aug:
+                        f = aug(f, param)
+                    inputs[(n + "_aug", im, i)] = self.to_tensor(f)
+                else:
+                    inputs[(n + "_aug", im, i)] = self.to_tensor(f)
 
     def __len__(self):
         return len(self.filenames)
@@ -173,8 +170,9 @@ class MonoDataset(data.Dataset):
             inputs[("inv_K", scale)] = torch.from_numpy(inv_K)
 
         if do_color_aug:
-            color_aug = transforms.ColorJitter.get_params(
-                self.brightness, self.contrast, self.saturation, self.hue)
+            order, *params = transforms.ColorJitter.get_params(self.brightness, self.contrast, self.saturation, self.hue)
+            aug = [(jitter, param) for jitter, param in zip(self.color_jitter, params)]
+            color_aug = [aug[order[0]], aug[order[1]], aug[order[2]], aug[order[3]]]
         else:
             color_aug = (lambda x: x)
 
