@@ -48,6 +48,12 @@ class PoseDecoder(nn.Module):
             self.deform_convs[("offset", 2)] = nn.Conv2d(256, 2*1*1, 3, 1, 1)
             self.deform_convs[("mask", 2)]   = nn.Conv2d(256, 1*1, 3, 1, 1)
 
+            for i in range(3):
+                nn.init.constant_(self.deform_convs[("offset", i)].weight, 0.)
+                nn.init.constant_(self.deform_convs[("offset", i)].bias, 0.)
+                nn.init.constant_(self.deform_convs[("mask", i)].weight, 0.)
+                nn.init.constant_(self.deform_convs[("mask", i)].bias, 0.)
+
             self.deform = nn.ModuleList(list(self.deform_convs.values()))
         else:
             self.convs[("pose", 0)] = nn.Conv2d(num_input_features * 256, 256, 3, 1, 1)

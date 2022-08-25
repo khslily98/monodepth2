@@ -8,3 +8,5 @@ models
 checkpoints
 KITTI_odom
 KITTI_raw
+.neptune/
+slurm_log/
