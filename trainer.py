@@ -88,7 +88,11 @@ class Trainer:
                     self.num_input_frames if self.opt.pose_model_input == "all" else 2)
 
             self.models["pose"].to(self.device)
-            self.parameters_to_train += list(self.models["pose"].parameters())
+            if self.opt.deformable_conv:
+                self.parameters_to_train  += [p for n, p in self.models["pose"].named_parameters() if 'net' in n]
+                self.deformable_parameters = [p for n, p in self.models["pose"].named_parameters() if 'deform' in n]
+            else:
+                self.parameters_to_train += list(self.models["pose"].parameters())
 
         if self.opt.predictive_mask:
             assert self.opt.disable_automasking, \
@@ -102,7 +106,13 @@ class Trainer:
             self.models["predictive_mask"].to(self.device)
             self.parameters_to_train += list(self.models["predictive_mask"].parameters())
 
-        self.model_optimizer = optim.Adam(self.parameters_to_train, self.opt.learning_rate)
+        if self.opt.deformable_conv:
+            self.model_optimizer = optim.Adam([
+                {'params': self.parameters_to_train},
+                {'params': self.deformable_parameters, 'lr': self.opt.learning_rate * 0.1}
+                ], self.opt.learning_rate)
+        else:
+            self.model_optimizer = optim.Adam(self.parameters_to_train, self.opt.learning_rate)
         self.model_lr_scheduler = optim.lr_scheduler.StepLR(
             self.model_optimizer, self.opt.scheduler_step_size, 0.1)
 

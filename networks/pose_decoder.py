@@ -35,17 +35,20 @@ class PoseDecoder(nn.Module):
         self.convs[("squeeze")] = nn.Conv2d(self.num_ch_enc[-1], 256, 1)
 
         if deformable_conv:
+            self.deform_convs = OrderedDict()
             self.convs[("pose", 0)]   = ops.DeformConv2d(num_input_features*256, 256, 3, 1, 1)
-            self.convs[("offset", 0)] = nn.Conv2d(num_input_features*256, 2*3*3, 3, 1, 1)
-            self.convs[("mask", 0)]   = nn.Conv2d(num_input_features*256, 3*3, 3, 1, 1)
+            self.deform_convs[("offset", 0)] = nn.Conv2d(num_input_features*256, 2*3*3, 3, 1, 1)
+            self.deform_convs[("mask", 0)]   = nn.Conv2d(num_input_features*256, 3*3, 3, 1, 1)
 
             self.convs[("pose", 1)] = ops.DeformConv2d(256, 256, 3, 1, 1)
-            self.convs[("offset", 1)] = nn.Conv2d(256, 2*3*3, 3, 1, 1)
-            self.convs[("mask", 1)]   = nn.Conv2d(256, 3*3, 3, 1, 1)
+            self.deform_convs[("offset", 1)] = nn.Conv2d(256, 2*3*3, 3, 1, 1)
+            self.deform_convs[("mask", 1)]   = nn.Conv2d(256, 3*3, 3, 1, 1)
 
             self.convs[("pose", 2)] = ops.DeformConv2d(256, 6*num_frames_to_predict_for, 1, 1, 0)
-            self.convs[("offset", 2)] = nn.Conv2d(256, 2*1*1, 3, 1, 1)
-            self.convs[("mask", 2)]   = nn.Conv2d(256, 1*1, 3, 1, 1)
+            self.deform_convs[("offset", 2)] = nn.Conv2d(256, 2*1*1, 3, 1, 1)
+            self.deform_convs[("mask", 2)]   = nn.Conv2d(256, 1*1, 3, 1, 1)
+
+            self.deform = nn.ModuleList(list(self.deform_convs.values()))
         else:
             self.convs[("pose", 0)] = nn.Conv2d(num_input_features * 256, 256, 3, 1, 1)
             self.convs[("pose", 1)] = nn.Conv2d(256, 256, 3, 1, 1)
@@ -64,8 +67,8 @@ class PoseDecoder(nn.Module):
         out = cat_features
         for i in range(3):
             if self.deformable_conv:
-                offset = self.convs[("offset", i)](out)
-                mask = F.sigmoid(self.convs[("mask", i)](out))
+                offset = self.deform_convs[("offset", i)](out)
+                mask = F.sigmoid(self.deform_convs[("mask", i)](out))
                 out = self.convs[("pose", i)](out, offset, mask)
             else:
                 out = self.convs[("pose", i)](out)
