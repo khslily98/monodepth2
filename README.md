@@ -252,9 +252,8 @@ You can download our precomputed disparity predictions from the following links:
 | Mono + Stereo     | 1024 x 320  | 914 MB          | [Download 🔗](https://storage.googleapis.com/niantic-lon-static/research/monodepth2/mono%2Bstereo_1024x320_eigen.npy) |
 
 
-## Reproduction + Additional Experimental Results
+## KSH: Reproduction + Additional Experimental Results
 [Dropbox](https://www.dropbox.com/sh/a2jcdo0ws08pw5u/AACXkUKSV8JSILvCpf34QYVta?dl=0)
-
 
 
 ## 👩‍⚖️ License
