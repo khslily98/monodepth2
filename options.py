@@ -99,7 +99,7 @@ class MonodepthOptions:
         self.parser.add_argument("--scheduler_step_size",
                                  type=int,
                                  help="step size of the scheduler",
-                                 default=15)
+                                 default=20)
 
         # ABLATION options
         self.parser.add_argument("--v1_multiscale",
