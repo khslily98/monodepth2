@@ -36,7 +36,7 @@ if __name__ == "__main__":
         "num_epochs": opts.num_epochs,
         "pose_model_type": opts.pose_model_type,
         "deformable_conv": opts.deformable_conv,
-        "uncertainty_input": opts.uncertainty_input}
+        "uncertainty": opts.uncertainty}
     run["parameters"] = params
 
     trainer = Trainer(opts)

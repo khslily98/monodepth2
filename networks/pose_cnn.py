@@ -13,10 +13,10 @@ import torchvision.ops as ops
 from collections import OrderedDict
 
 class PoseCNN(nn.Module):
-    def __init__(self, deformable_conv, uncertainty_input, num_input_frames):
+    def __init__(self, deformable_conv, uncertainty, num_input_frames):
         super(PoseCNN, self).__init__()
         self.deformable_conv = deformable_conv
-        self.uncertainty_input = uncertainty_input
+        self.uncertainty = uncertainty
         self.num_input_frames = num_input_frames
 
         self.convs = OrderedDict()

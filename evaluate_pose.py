@@ -94,7 +94,7 @@ def evaluate(opt):
 
         pose_decoder = networks.PoseDecoder(pose_encoder.num_ch_enc, 1,
                                             opt.deformable_conv,
-                                            opt.uncertainty_input,
+                                            opt.uncertainty,
                                             num_frames_to_predict_for=1)
         pose_decoder.load_state_dict(torch.load(pose_decoder_path))
 
@@ -104,13 +104,13 @@ def evaluate(opt):
         pose_decoder.eval()
     else:
         pose_path = os.path.join(opt.load_weights_folder, "pose.pth")
-        pose_network = networks.PoseCNN(opt.deformable_conv, opt.uncertainty_input, 2)
+        pose_network = networks.PoseCNN(opt.deformable_conv, opt.uncertainty, 2)
         pose_network.load_state_dict(torch.load(pose_path))
 
         pose_network.cuda()
         pose_network.eval()
 
-    if opt.uncertainty_input:
+    if opt.uncertainty:
         encoder_path = os.path.join(opt.load_weights_folder, "encoder.pth")
         decoder_path = os.path.join(opt.load_weights_folder, "depth.pth")
 
@@ -138,7 +138,7 @@ def evaluate(opt):
             for key, ipt in inputs.items():
                 inputs[key] = ipt.cuda()
 
-            if opt.uncertainty_input:
+            if opt.uncertainty:
                 input_color = inputs[("color_aug", 0, 0)]
                 N = input_color.shape[0]
 

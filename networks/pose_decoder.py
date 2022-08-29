@@ -18,14 +18,14 @@ class PoseDecoder(nn.Module):
                 num_ch_enc, 
                 num_input_features, 
                 deformable_conv=False,
-                uncertainty_input=False,
+                uncertainty=False,
                 num_frames_to_predict_for=None):
         super(PoseDecoder, self).__init__()
 
         self.num_ch_enc = num_ch_enc
         self.num_input_features = num_input_features
         self.deformable_conv = deformable_conv
-        self.uncertainty_input = uncertainty_input
+        self.uncertainty = uncertainty
 
         if num_frames_to_predict_for is None:
             num_frames_to_predict_for = num_input_features - 1

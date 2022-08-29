@@ -122,7 +122,7 @@ def read_json_option(load_weights_folder):
 def load_training_option(opt):
     training_opt = read_json_option(opt.load_weights_folder)
     keys_to_load = ["deformable_conv", 
-                    "uncertainty_input", 
+                    "uncertainty", 
                     "pose_model_input",
                     "pose_model_type",
                     "num_layers"]

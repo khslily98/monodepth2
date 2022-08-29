@@ -119,7 +119,7 @@ class MonodepthOptions:
                                  action="store_true")
         self.parser.add_argument("--deformable_conv",
                                  action="store_true")
-        self.parser.add_argument("--uncertainty_input",
+        self.parser.add_argument("--uncertainty",
                                  action="store_true")    
         self.parser.add_argument("--weights_init",
                                  type=str,
