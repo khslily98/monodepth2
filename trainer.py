@@ -57,7 +57,7 @@ class Trainer:
         self.parameters_to_train += list(self.models["encoder"].parameters())
 
         self.models["depth"] = networks.DepthDecoder(
-            self.models["encoder"].num_ch_enc, self.opt.scales)
+            self.models["encoder"].num_ch_enc, self.opt.uncertainty, self.opt.scales)
         self.models["depth"].to(self.device)
         self.parameters_to_train += list(self.models["depth"].parameters())
 
@@ -74,7 +74,7 @@ class Trainer:
                 self.models["pose"] = networks.PoseDecoder(
                     self.models["pose_encoder"].num_ch_enc, 1,
                     self.opt.deformable_conv,
-                    self.opt.uncertainty_input,
+                    self.opt.uncertainty,
                     num_frames_to_predict_for=1)
 
             elif self.opt.pose_model_type == "shared":
@@ -84,7 +84,7 @@ class Trainer:
             elif self.opt.pose_model_type == "posecnn":
                 self.models["pose"] = networks.PoseCNN(
                     self.opt.deformable_conv,
-                    self.opt.uncertainty_input,
+                    self.opt.uncertainty,
                     self.num_input_frames if self.opt.pose_model_input == "all" else 2)
 
             self.models["pose"].to(self.device)
@@ -259,24 +259,26 @@ class Trainer:
         else:
             # Otherwise, we only feed the image with frame_id 0 through the depth encoder
             input_color = inputs[("color_aug", 0, 0)]
-            if self.opt.uncertainty_input:
-                input_color = torch.cat((input_color, torch.flip(input_color, [3])), 0)
             features = self.models["encoder"](input_color)
             outputs = self.models["depth"](features)
 
-            if self.opt.uncertainty_input:    
-                N = self.opt.batch_size
-                for s in self.opt.scales:
-                    outputs[('disp', s)], disp_rev = outputs[('disp', s)][:N], torch.flip(outputs[('disp', s)][N:], [3])
-                    with torch.no_grad():
-                        outputs[('uncert', s)] = torch.abs(outputs[('disp', s)] - disp_rev)
-            uncertainty = [outputs[('uncert', s)] for s in self.opt.scales] if self.opt.uncertainty_input else None
+            uncertainty = [outputs[('uncertainty', s)] for s in self.opt.scales] if self.opt.uncertainty else None
 
         if self.opt.predictive_mask:
             outputs["predictive_mask"] = self.models["predictive_mask"](features)
 
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, uncertainty))
+
+        # Interpolate uncertainty map to input image size
+        if self.opt.uncertainty:
+            for scale in self.opt.scales:
+                outputs[("uncertainty", scale)] = F.interpolate(
+                    outputs[("uncertainty", scale)], 
+                    [self.opt.height, self.opt.width], 
+                    mode="bilinear", 
+                    align_corners=False
+                )
 
         self.generate_images_pred(inputs, outputs)
         losses = self.compute_losses(inputs, outputs)
@@ -505,6 +507,11 @@ class Trainer:
                 outputs["identity_selection/{}".format(scale)] = (
                     idxs > identity_reprojection_loss.shape[1] - 1).float()
 
+            # Photometric uncertainty loss term
+            if self.opt.uncertainty:
+                uncertainty = outputs[("uncertainty", scale)].squeeze()
+                to_optimise = torch.div(to_optimise, uncertainty) + torch.log(uncertainty)
+
             loss += to_optimise.mean()
 
             mean_disp = disp.mean(2, True).mean(3, True)
@@ -583,10 +590,10 @@ class Trainer:
                     "disp_{}/{}".format(s, j),
                     normalize_image(outputs[("disp", s)][j]), self.step)
                 
-                if self.opt.uncertainty_input:
+                if self.opt.uncertainty:
                     writer.add_image(
-                        "uncert_{}/{}".format(s, j),
-                        normalize_image(outputs[("uncert", s)][j]), self.step)
+                        "uncertainty_{}/{}".format(s, j),
+                        normalize_image(outputs[("uncertainty", s)][j]), self.step)
 
                 if self.opt.predictive_mask:
                     for f_idx, frame_id in enumerate(self.opt.frame_ids[1:]):
