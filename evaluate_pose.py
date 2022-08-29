@@ -60,7 +60,7 @@ def compute_ate(gtruth_xyz, pred_xyz_o):
     # Optimize the scaling factor
     scale = np.sum(gtruth_xyz * pred_xyz) / np.sum(pred_xyz ** 2)
     alignment_error = pred_xyz * scale - gtruth_xyz
-    rmse = np.sqrt(np.sum(alignment_error ** 2) / gtruth_xyz.shape[0])
+    rmse = np.sqrt(np.sqrt(np.sum(alignment_error ** 2)) / gtruth_xyz.shape[0])
     return rmse
 
 
