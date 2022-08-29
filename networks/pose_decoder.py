@@ -32,52 +32,56 @@ class PoseDecoder(nn.Module):
         self.num_frames_to_predict_for = num_frames_to_predict_for
 
         self.convs = OrderedDict()
-        self.convs[("squeeze")] = nn.Conv2d(self.num_ch_enc[-1], 256, 1)
+        self.squeeze = nn.Conv2d(self.num_ch_enc[-1], 256, 1)
 
         if deformable_conv:
-            self.deform_convs = OrderedDict()
-            self.convs[("pose", 0)]   = ops.DeformConv2d(num_input_features*256, 256, 3, 1, 1)
-            self.deform_convs[("offset", 0)] = nn.Conv2d(num_input_features*256, 2*3*3, 3, 1, 1)
-            self.deform_convs[("mask", 0)]   = nn.Conv2d(num_input_features*256, 3*3, 3, 1, 1)
+            self.offset_convs = OrderedDict()
+            self.mask_convs = OrderedDict()
 
-            self.convs[("pose", 1)] = ops.DeformConv2d(256, 256, 3, 1, 1)
-            self.deform_convs[("offset", 1)] = nn.Conv2d(256, 2*3*3, 3, 1, 1)
-            self.deform_convs[("mask", 1)]   = nn.Conv2d(256, 3*3, 3, 1, 1)
+            self.convs[0]   = ops.DeformConv2d(num_input_features*256, 256, 3, 1, 1)
+            self.offset_convs[0] = nn.Conv2d(num_input_features*256, 2*3*3, 3, 1, 1)
+            self.mask_convs[0]   = nn.Conv2d(num_input_features*256, 3*3, 3, 1, 1)
 
-            self.convs[("pose", 2)] = ops.DeformConv2d(256, 6*num_frames_to_predict_for, 1, 1, 0)
-            self.deform_convs[("offset", 2)] = nn.Conv2d(256, 2*1*1, 3, 1, 1)
-            self.deform_convs[("mask", 2)]   = nn.Conv2d(256, 1*1, 3, 1, 1)
+            self.convs[1] = ops.DeformConv2d(256, 256, 3, 1, 1)
+            self.offset_convs[1] = nn.Conv2d(256, 2*3*3, 3, 1, 1)
+            self.mask_convs[1]   = nn.Conv2d(256, 3*3, 3, 1, 1)
+
+            self.convs[2] = ops.DeformConv2d(256, 6*num_frames_to_predict_for, 1, 1, 0)
+            self.offset_convs[2] = nn.Conv2d(256, 2*1*1, 3, 1, 1)
+            self.mask_convs[2]   = nn.Conv2d(256, 1*1, 3, 1, 1)
 
             for i in range(3):
-                nn.init.constant_(self.deform_convs[("offset", i)].weight, 0.)
-                nn.init.constant_(self.deform_convs[("offset", i)].bias, 0.)
-                nn.init.constant_(self.deform_convs[("mask", i)].weight, 0.)
-                nn.init.constant_(self.deform_convs[("mask", i)].bias, 0.)
+                nn.init.constant_(self.offset_convs[("offset", i)].weight, 0.)
+                nn.init.constant_(self.offset_convs[("offset", i)].bias, 0.)
+                nn.init.constant_(self.mask_convs[("mask", i)].weight, 0.)
+                nn.init.constant_(self.mask_convs[("mask", i)].bias, 0.)
 
-            self.deform = nn.ModuleList(list(self.deform_convs.values()))
+            self.offset = nn.ModuleList(list(self.offset_convs.values()))
+            self.mask = nn.ModuleList(list(self.mask_convs.values()))
         else:
-            self.convs[("pose", 0)] = nn.Conv2d(num_input_features * 256, 256, 3, 1, 1)
-            self.convs[("pose", 1)] = nn.Conv2d(256, 256, 3, 1, 1)
-            self.convs[("pose", 2)] = nn.Conv2d(256, 6 * num_frames_to_predict_for, 1)
+            self.convs[0] = nn.Conv2d(num_input_features * 256, 256, 3, 1, 1)
+            self.convs[1] = nn.Conv2d(256, 256, 3, 1, 1)
+            self.convs[2] = nn.Conv2d(256, 6 * num_frames_to_predict_for, 1)
 
         self.relu = nn.ReLU()
 
+        self.num_convs = len(self.convs)
         self.net = nn.ModuleList(list(self.convs.values()))
 
     def forward(self, input_features, uncertainty):
         last_features = [f[-1] for f in input_features]
 
-        cat_features = [self.relu(self.convs["squeeze"](f)) for f in last_features]
+        cat_features = [self.relu(self.squeeze(f)) for f in last_features]
         cat_features = torch.cat(cat_features, 1)
 
         out = cat_features
         for i in range(3):
             if self.deformable_conv:
-                offset = self.deform_convs[("offset", i)](out)
-                mask = F.sigmoid(self.deform_convs[("mask", i)](out))
-                out = self.convs[("pose", i)](out, offset, mask)
+                offset = self.offset_convs[i](out)
+                mask = torch.sigmoid(self.mask_convs[i](out))
+                out = self.convs[i](out, offset, mask)
             else:
-                out = self.convs[("pose", i)](out)
+                out = self.convs[i](out)
             if i != 2:
                 out = self.relu(out)
 

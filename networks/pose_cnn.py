@@ -22,44 +22,47 @@ class PoseCNN(nn.Module):
         self.convs = OrderedDict()
         
         if not deformable_conv:
-            self.convs[('pose', 0)] = nn.Conv2d(3 * num_input_frames, 16, 7, 2, 3)
-            self.convs[('pose', 1)] = nn.Conv2d(16, 32, 5, 2, 2)
-            self.convs[('pose', 2)] = nn.Conv2d(32, 64, 3, 2, 1)
-            self.convs[('pose', 3)] = nn.Conv2d(64, 128, 3, 2, 1)
+            self.convs[0] = nn.Conv2d(3 * num_input_frames, 16, 7, 2, 3)
+            self.convs[1] = nn.Conv2d(16, 32, 5, 2, 2)
+            self.convs[2] = nn.Conv2d(32, 64, 3, 2, 1)
+            self.convs[3] = nn.Conv2d(64, 128, 3, 2, 1)
         else:
-            self.deformable_convs = OrderedDict()
+            self.offset_convs = OrderedDict()
+            self.mask_convs = OrderedDict()
 
-            self.convs[('pose', 0)] = ops.DeformConv2d(3 * num_input_frames, 16, 7, 2, 3)
-            self.deformable_convs[('offset', 0)] = nn.Conv2d(3 * num_input_frames, 2*7*7, 7, 2, 3)
-            self.deformable_convs[('mask', 0)]   = nn.Conv2d(3 * num_input_frames, 7*7, 7, 2, 3)
+            self.convs[0] = ops.DeformConv2d(3 * num_input_frames, 16, 7, 2, 3)
+            self.offset_convs[0] = nn.Conv2d(3 * num_input_frames, 2*7*7, 7, 2, 3)
+            self.mask_convs[0]   = nn.Conv2d(3 * num_input_frames, 7*7, 7, 2, 3)
 
-            self.convs[('pose', 1)] = ops.DeformConv2d(16, 32, kernel_size=5, stride=2, padding=2)
-            self.deformable_convs[('offset', 1)] = nn.Conv2d(16, 2*5*5, 5, 2, 2)
-            self.deformable_convs[('mask', 1)]   = nn.Conv2d(16, 5*5, 5, 2, 2)
+            self.convs[1] = ops.DeformConv2d(16, 32, kernel_size=5, stride=2, padding=2)
+            self.offset_convs[1] = nn.Conv2d(16, 2*5*5, 5, 2, 2)
+            self.mask_convs[1]   = nn.Conv2d(16, 5*5, 5, 2, 2)
 
-            self.convs[('pose', 2)]  = ops.DeformConv2d(32, 64, kernel_size=3, stride=2, padding=1)
-            self.deformable_convs[('offset', 2)] = nn.Conv2d(32, 2*3*3, 3, 2, 1)
-            self.deformable_convs[('mask', 2)]   = nn.Conv2d(32, 3*3, 3, 2, 1)
+            self.convs[2]  = ops.DeformConv2d(32, 64, kernel_size=3, stride=2, padding=1)
+            self.offset_convs[2] = nn.Conv2d(32, 2*3*3, 3, 2, 1)
+            self.mask_convs[2]   = nn.Conv2d(32, 3*3, 3, 2, 1)
 
-            self.convs[('pose', 3)]  = ops.DeformConv2d(64, 128, kernel_size=3, stride=2, padding=1)
-            self.deformable_convs[('offset', 2)] = nn.Conv2d(64, 2*3*3, 3, 2, 1)
-            self.deformable_convs[('mask', 2)]   = nn.Conv2d(64, 3*3, 3, 2, 1)
+            self.convs[3]  = ops.DeformConv2d(64, 128, kernel_size=3, stride=2, padding=1)
+            self.offset_convs[3] = nn.Conv2d(64, 2*3*3, 3, 2, 1)
+            self.mask_convs[3]   = nn.Conv2d(64, 3*3, 3, 2, 1)
 
-            for i in range(4):
-                nn.init.constant_(self.deformable_convs[('offset', i)].weight, 0.)
-                nn.init.constant_(self.deformable_convs[('offset', i)].bias, 0.)
-                nn.init.constant_(self.deformable_convs[('mask', i)].weight, 0.)
-                nn.init.constant_(self.deformable_convs[('mask', i)].bias, 0.)
+            for i in range(len(self.offset_convs)):
+                nn.init.constant_(self.offset_convs[i].weight, 0.)
+                nn.init.constant_(self.offset_convs[i].bias, 0.)
+                nn.init.constant_(self.mask_convs[i].weight, 0.)
+                nn.init.constant_(self.mask_convs[i].bias, 0.)
             
-            self.deform = nn.ModuleList(list(self.deformable_convs.values()))
+            self.offset = nn.ModuleList(list(self.offset_convs.values()))
+            self.mask = nn.ModuleList(list(self.mask_convs.values()))
 
-        self.convs[('pose', 4)] = nn.Conv2d(128, 256, 3, 2, 1)
-        self.convs[('pose', 5)] = nn.Conv2d(256, 256, 3, 2, 1)
-        self.convs[('pose', 6)] = nn.Conv2d(256, 256, 3, 2, 1)
+        self.convs[4] = nn.Conv2d(128, 256, 3, 2, 1)
+        self.convs[5] = nn.Conv2d(256, 256, 3, 2, 1)
+        self.convs[6] = nn.Conv2d(256, 256, 3, 2, 1)
 
-        self.convs[('out')] = nn.Conv2d(256, 6 * (num_input_frames - 1), 1)
+        self.pose_conv = nn.Conv2d(256, 6 * (num_input_frames - 1), 1)
 
         self.num_convs = len(self.convs)
+        self.num_deforms = len(self.offset_convs)
 
         self.relu = nn.ReLU(True)
 
@@ -67,12 +70,10 @@ class PoseCNN(nn.Module):
 
     def forward(self, out, uncertainty):
         for i in range(self.num_convs):
-            if i <= 3 and self.deformable_conv:
-                if self.uncertainty_input:
-                    attention = F.sigmoid(uncertainty[i])
-                    out = self.convs[i](out, self.offset[i](out * attention), F.sigmoid(self.mask[i](out * attention)))
-                else:
-                    out = self.convs[i](out, self.offset[i](out), F.sigmoid(self.mask[i](out)))
+            if self.deformable_conv:
+                if i <= self.num_deforms - 1:
+                    att = 1 if uncertainty is None else torch.sigmoid(uncertainty[i])
+                    out = self.convs[i](out, self.offset_convs[i](out*att), torch.sigmoid(self.mask_convs[i](out*att)))
             else:
                 out = self.convs[i](out)
             out = self.relu(out)
