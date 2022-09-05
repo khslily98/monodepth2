@@ -509,7 +509,7 @@ class Trainer:
 
             # Photometric uncertainty loss term
             if self.opt.uncertainty:
-                uncertainty = outputs[("uncertainty", scale)].squeeze()
+                uncertainty = outputs[("uncertainty", scale)].squeeze() + 1e-7
                 to_optimise = torch.div(to_optimise, uncertainty) + torch.log(uncertainty)
 
             loss += to_optimise.mean()

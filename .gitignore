@@ -9,5 +9,6 @@ checkpoints
 KITTI_odom
 KITTI_raw
 .neptune/
+.github/
 slurm_log/
 visualizations/

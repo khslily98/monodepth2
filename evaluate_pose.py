@@ -87,21 +87,21 @@ def evaluate(opt):
 
     if opt.pose_model_type is not 'posecnn':
         pose_encoder_path = os.path.join(opt.load_weights_folder, "pose_encoder.pth")
-        pose_decoder_path = os.path.join(opt.load_weights_folder, "pose.pth")
+        pose_network_path = os.path.join(opt.load_weights_folder, "pose.pth")
 
         pose_encoder = networks.ResnetEncoder(opt.num_layers, False, 2)
         pose_encoder.load_state_dict(torch.load(pose_encoder_path))
 
-        pose_decoder = networks.PoseDecoder(pose_encoder.num_ch_enc, 1,
+        pose_network = networks.PoseDecoder(pose_encoder.num_ch_enc, 1,
                                             opt.deformable_conv,
                                             opt.uncertainty,
                                             num_frames_to_predict_for=1)
-        pose_decoder.load_state_dict(torch.load(pose_decoder_path))
+        pose_network.load_state_dict(torch.load(pose_network_path))
 
         pose_encoder.cuda()
         pose_encoder.eval()
-        pose_decoder.cuda()
-        pose_decoder.eval()
+        pose_network.cuda()
+        pose_network.eval()
     else:
         pose_path = os.path.join(opt.load_weights_folder, "pose.pth")
         pose_network = networks.PoseCNN(opt.deformable_conv, opt.uncertainty, 2)
@@ -116,7 +116,7 @@ def evaluate(opt):
 
         encoder_dict = torch.load(encoder_path)
         encoder = networks.ResnetEncoder(opt.num_layers, False)
-        depth_decoder = networks.DepthDecoder(encoder.num_ch_enc)
+        depth_decoder = networks.DepthDecoder(encoder.num_ch_enc, opt.uncertainty)
 
         model_dict = encoder.state_dict()
         encoder.load_state_dict({k: v for k, v in encoder_dict.items() if k in model_dict})
@@ -140,23 +140,20 @@ def evaluate(opt):
 
             if opt.uncertainty:
                 input_color = inputs[("color_aug", 0, 0)]
-                N = input_color.shape[0]
-
                 input_color = torch.cat((input_color, torch.flip(input_color, [3])), 0)
                 outputs = depth_decoder(encoder(input_color))
-                uncertainty = []
-                for s in opt.scales:
-                    disp, disp_rev = outputs[('disp', s)][:N], torch.flip(outputs[('disp', s)][N:], [3])
-                    uncertainty.append(torch.abs(disp - disp_rev))
+                uncertainty = outputs[("uncertainty", 0)]
             else:
                 uncertainty = None
 
             all_color_aug = torch.cat([inputs[("color_aug", i, 0)] for i in opt.frame_ids], 1)
+            
             if opt.pose_model_type is not 'posecnn':
                 features = [pose_encoder(all_color_aug)]
-                axisangle, translation = pose_decoder(features)
             else:
-                axisangle, translation = pose_network(all_color_aug, uncertainty)
+                features = all_color_aug
+            
+            axisangle, translation = pose_network(features, uncertainty)
 
             pred_poses.append(
                 transformation_from_parameters(axisangle[:, 0], translation[:, 0]).cpu().numpy())
