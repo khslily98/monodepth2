@@ -165,6 +165,9 @@ class MonodepthOptions:
                                  type=int,
                                  help="number of epochs between each save",
                                  default=1)
+        self.parser.add_argument("--neptune",
+                                 help="if set upload logs to neptune ai",
+                                 action="store_true")
 
         # EVALUATION options
         self.parser.add_argument("--eval_stereo",
