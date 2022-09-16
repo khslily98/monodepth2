@@ -19,7 +19,7 @@ class DepthDecoder(nn.Module):
         super(DepthDecoder, self).__init__()
 
         self.uncertainty = uncertainty
-        self.num_output_channels = 2 if uncertainty else 1
+        self.num_output_channels = 3 if uncertainty else 1
         self.use_skips = use_skips
         self.upsample_mode = 'nearest'
         self.scales = scales
@@ -62,7 +62,10 @@ class DepthDecoder(nn.Module):
             if i in self.scales:
                 out = torch.sigmoid(self.convs[("outconv", i)](x))
                 if self.uncertainty:
-                    self.outputs[("disp", i)], self.outputs[("uncertainty", i)] = torch.split(out, 1, dim=1)
+                    disp, disp_s, uncert = torch.split(out, 1, dim=1)
+                    self.outputs[("disp", i)] = disp
+                    self.outputs[("disp_s", i)] = disp_s
+                    self.outputs[("uncertainty", i)] = uncert
                 else:
                     self.outputs[("disp", i)] = out
 

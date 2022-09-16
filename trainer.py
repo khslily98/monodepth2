@@ -29,6 +29,7 @@ from IPython import embed
 class Trainer:
     def __init__(self, options):
         self.opt = options
+        torch.autograd.set_detect_anomaly(True)
         self.log_path = os.path.join(self.opt.log_dir, self.opt.model_name)
 
         # checking height and width are multiples of 32
@@ -270,16 +271,6 @@ class Trainer:
         if self.use_pose_net:
             outputs.update(self.predict_poses(inputs, features, uncertainty))
 
-        # Interpolate uncertainty map to input image size
-        if self.opt.uncertainty:
-            for scale in self.opt.scales:
-                outputs[("uncertainty", scale)] = F.interpolate(
-                    outputs[("uncertainty", scale)], 
-                    [self.opt.height, self.opt.width], 
-                    mode="bilinear", 
-                    align_corners=False
-                )
-
         self.generate_images_pred(inputs, outputs)
         losses = self.compute_losses(inputs, outputs)
 
@@ -388,6 +379,7 @@ class Trainer:
                 else:
                     T = outputs[("cam_T_cam", 0, frame_id)]
 
+                '''
                 # from the authors of https://arxiv.org/abs/1712.00175
                 if self.opt.pose_model_type == "posecnn":
 
@@ -399,7 +391,7 @@ class Trainer:
 
                     T = transformation_from_parameters(
                         axisangle[:, 0], translation[:, 0] * mean_inv_depth[:, 0], frame_id < 0)
-
+                '''
                 cam_points = self.backproject_depth[source_scale](
                     depth, inputs[("inv_K", source_scale)])
                 pix_coords = self.project_3d[source_scale](
@@ -415,6 +407,31 @@ class Trainer:
                 if not self.opt.disable_automasking:
                     outputs[("color_identity", frame_id, scale)] = \
                         inputs[("color", frame_id, source_scale)]
+
+            if self.opt.uncertainty:
+                disp = outputs[("disp_s", scale)]
+                disp = F.interpolate(
+                    disp, [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
+                source_scale = 0
+
+                _, depth = disp_to_depth(disp, self.opt.min_depth, self.opt.max_depth)
+                outputs[("depth_s", 0, scale)] = depth
+
+                T = inputs["stereo_T"]
+                T[:, 0, 3] *= -1
+
+                cam_points = self.backproject_depth[source_scale](
+                    depth, inputs[("inv_K", source_scale)])
+                pix_coords = self.project_3d[source_scale](
+                    cam_points, inputs[("K", source_scale)], T)
+
+                outputs[("sample_s", 0, scale)] = pix_coords
+
+                outputs[("color_s", 0, scale)] = F.grid_sample(
+                    inputs[("color", 0, source_scale)],
+                    outputs[("sample_s", 0, scale)],
+                    padding_mode="border")
+
 
     def compute_reprojection_loss(self, pred, target):
         """Computes reprojection loss between a batch of predicted and target images
@@ -507,16 +524,43 @@ class Trainer:
                 outputs["identity_selection/{}".format(scale)] = (
                     idxs > identity_reprojection_loss.shape[1] - 1).float()
 
-            # Photometric uncertainty loss term
-            if self.opt.uncertainty:
-                uncertainty = outputs[("uncertainty", scale)].squeeze() + 1e-7
-                to_optimise = torch.div(to_optimise, uncertainty) + torch.log(uncertainty)
-
-            loss += to_optimise.mean()
+            losses["min_repr_loss/{}".format(scale)] = to_optimise.mean()
 
             mean_disp = disp.mean(2, True).mean(3, True)
             norm_disp = disp / (mean_disp + 1e-7)
             smooth_loss = get_smooth_loss(norm_disp, color)
+
+            # Uncertainty estimation loss terms
+            if self.opt.uncertainty:
+                # Stereo reprojection loss
+                disp_s = outputs[("disp_s", scale)]
+                color_s = inputs[("color", "s", scale)]
+                target_s = inputs[("color", "s", source_scale)]
+                pred_s = outputs[("color_s", 0, scale)]
+                
+                stereo_reprojection_loss = self.compute_reprojection_loss(pred_s, target_s).squeeze()
+                losses["stereo_repr_loss/{}".format(scale)] = stereo_reprojection_loss.mean()
+
+                # Photometric uncertainty loss
+                uncertainty = F.interpolate(
+                    outputs[("uncertainty", scale)], 
+                    [self.opt.height, self.opt.width], 
+                    mode="bilinear", 
+                    align_corners=False
+                )
+                uncertainty = uncertainty.squeeze() + 1e-7
+                div_term = to_optimise / uncertainty
+                log_term = torch.log(uncertainty)
+                losses["min_repr_over_uncert/{}".format(scale)] = div_term.mean()
+                losses["uncert_log/{}".format(scale)] = log_term.mean()
+                to_optimise = stereo_reprojection_loss + div_term + log_term
+
+                # Depth smoothness on stereo image
+                mean_disp_s = disp_s.mean(2, True).mean(3, True)
+                norm_disp_s = disp_s / (mean_disp_s + 1e-7)
+                smooth_loss += get_smooth_loss(norm_disp_s, color_s)
+
+            loss += to_optimise.mean()
 
             loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
             total_loss += loss
@@ -593,7 +637,15 @@ class Trainer:
                 if self.opt.uncertainty:
                     writer.add_image(
                         "uncertainty_{}/{}".format(s, j),
-                        normalize_image(outputs[("uncertainty", s)][j]), self.step)
+                        normalize_image(torch.exp(outputs[("uncertainty", s)][j])), self.step)
+                    
+                    writer.add_image(
+                        "color_s_pred_{}/{}".format(s, j),
+                        outputs[("color_s", 0, s)][j].data, self.step)
+                    
+                    writer.add_image(
+                        "disp_s_{}/{}".format(s, j),
+                        normalize_image(outputs[("disp_s", s)][j]), self.step)
 
                 if self.opt.predictive_mask:
                     for f_idx, frame_id in enumerate(self.opt.frame_ids[1:]):
