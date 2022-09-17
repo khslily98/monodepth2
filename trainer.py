@@ -54,13 +54,19 @@ class Trainer:
 
         self.models["encoder"] = networks.ResnetEncoder(
             self.opt.num_layers, self.opt.weights_init == "pretrained")
+        self.models["encoder"].load_state_dict(torch.load("teacher_encoder.pth"))
+        for param in self.models["encoder"].parameters():
+            param.requires_grad_(False)
         self.models["encoder"].to(self.device)
-        self.parameters_to_train += list(self.models["encoder"].parameters())
+        #self.parameters_to_train += list(self.models["encoder"].parameters())
 
-        self.models["depth"] = networks.DepthDecoder(
-            self.models["encoder"].num_ch_enc, self.opt.uncertainty, self.opt.scales)
+        self.models["depth"] = networks.DepthUncertaintyDecoder(
+            self.models["encoder"].num_ch_enc, self.opt.scales, uncert=self.opt.uncertainty)
+        self.models["depth"].load_state_dict(torch.load("teacher_depth.pth"))
+        for param in self.models["depth"].parameters():
+            param.requires_grad_(False)
         self.models["depth"].to(self.device)
-        self.parameters_to_train += list(self.models["depth"].parameters())
+        #self.parameters_to_train += list(self.models["depth"].parameters())
 
         if self.use_pose_net:
             if self.opt.pose_model_type == "separate_resnet":
