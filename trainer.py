@@ -54,7 +54,7 @@ class Trainer:
 
         self.models["encoder"] = networks.ResnetEncoder(
             self.opt.num_layers, self.opt.weights_init == "pretrained")
-        self.models["encoder"].load_state_dict(torch.load("teacher_encoder.pth"))
+        self.models["encoder"].load_state_dict(torch.load("teacher_encoder.pth"), strict=False)
         for param in self.models["encoder"].parameters():
             param.requires_grad_(False)
         self.models["encoder"].to(self.device)
@@ -268,21 +268,20 @@ class Trainer:
             input_color = inputs[("color_aug", 0, 0)]
             features = self.models["encoder"](input_color)
             outputs = self.models["depth"](features)
-
-            uncertainty = [outputs[('uncertainty', s)] for s in self.opt.scales] if self.opt.uncertainty else None
+            disp_uncert = [outputs[('disp_uncert', s)] for s in self.opt.scales] if self.opt.uncertainty else None
 
         if self.opt.predictive_mask:
             outputs["predictive_mask"] = self.models["predictive_mask"](features)
 
         if self.use_pose_net:
-            outputs.update(self.predict_poses(inputs, features, uncertainty))
+            outputs.update(self.predict_poses(inputs, features, disp_uncert))
 
         self.generate_images_pred(inputs, outputs)
         losses = self.compute_losses(inputs, outputs)
 
         return outputs, losses
 
-    def predict_poses(self, inputs, features, uncertainty):
+    def predict_poses(self, inputs, features, disp_uncert):
         """Predict poses between input frames for monocular sequences.
         """
         outputs = {}
@@ -309,9 +308,12 @@ class Trainer:
                     elif self.opt.pose_model_type == "posecnn":
                         pose_inputs = torch.cat(pose_inputs, 1)
 
-                    axisangle, translation = self.models["pose"](pose_inputs, uncertainty)
+                    axisangle, translation, pose_uncertainty = self.models["pose"](pose_inputs, disp_uncert)
                     outputs[("axisangle", 0, f_i)] = axisangle
                     outputs[("translation", 0, f_i)] = translation
+                    if self.opt.uncertainty:
+                        for s in self.opt.scales:
+                            outputs[("pose_uncert", s)] = pose_uncertainty[s]
 
                     # Invert the matrix if the frame id is negative
                     outputs[("cam_T_cam", 0, f_i)] = transformation_from_parameters(
@@ -414,31 +416,6 @@ class Trainer:
                     outputs[("color_identity", frame_id, scale)] = \
                         inputs[("color", frame_id, source_scale)]
 
-            if self.opt.uncertainty:
-                disp = outputs[("disp_s", scale)]
-                disp = F.interpolate(
-                    disp, [self.opt.height, self.opt.width], mode="bilinear", align_corners=False)
-                source_scale = 0
-
-                _, depth = disp_to_depth(disp, self.opt.min_depth, self.opt.max_depth)
-                outputs[("depth_s", 0, scale)] = depth
-
-                T = inputs["stereo_T"]
-                T[:, 0, 3] *= -1
-
-                cam_points = self.backproject_depth[source_scale](
-                    depth, inputs[("inv_K", source_scale)])
-                pix_coords = self.project_3d[source_scale](
-                    cam_points, inputs[("K", source_scale)], T)
-
-                outputs[("sample_s", 0, scale)] = pix_coords
-
-                outputs[("color_s", 0, scale)] = F.grid_sample(
-                    inputs[("color", 0, source_scale)],
-                    outputs[("sample_s", 0, scale)],
-                    padding_mode="border")
-
-
     def compute_reprojection_loss(self, pred, target):
         """Computes reprojection loss between a batch of predicted and target images
         """
@@ -468,8 +445,8 @@ class Trainer:
             else:
                 source_scale = 0
 
-            disp = outputs[("disp", scale)]
-            color = inputs[("color", 0, scale)]
+            #disp = outputs[("disp", scale)]
+            #color = inputs[("color", 0, scale)]
             target = inputs[("color", 0, source_scale)]
 
             for frame_id in self.opt.frame_ids[1:]:
@@ -532,43 +509,27 @@ class Trainer:
 
             losses["min_repr_loss/{}".format(scale)] = to_optimise.mean()
 
-            mean_disp = disp.mean(2, True).mean(3, True)
-            norm_disp = disp / (mean_disp + 1e-7)
-            smooth_loss = get_smooth_loss(norm_disp, color)
-
             # Uncertainty estimation loss terms
             if self.opt.uncertainty:
-                # Stereo reprojection loss
-                disp_s = outputs[("disp_s", scale)]
-                color_s = inputs[("color", "s", scale)]
-                target_s = inputs[("color", "s", source_scale)]
-                pred_s = outputs[("color_s", 0, scale)]
-                
-                stereo_reprojection_loss = self.compute_reprojection_loss(pred_s, target_s).squeeze()
-                losses["stereo_repr_loss/{}".format(scale)] = stereo_reprojection_loss.mean()
-
                 # Photometric uncertainty loss
-                uncertainty = F.interpolate(
-                    outputs[("uncertainty", scale)], 
+                pose_uncert = F.interpolate(
+                    outputs[("pose_uncert", scale)], 
                     [self.opt.height, self.opt.width], 
                     mode="bilinear", 
                     align_corners=False
                 )
-                uncertainty = uncertainty.squeeze() + 1e-7
-                div_term = to_optimise / uncertainty
-                log_term = torch.log(uncertainty)
+
+                pose_uncert = pose_uncert.squeeze() + 1e-7
+                div_term = to_optimise / pose_uncert
+                log_term = torch.log(pose_uncert)
+
                 losses["min_repr_over_uncert/{}".format(scale)] = div_term.mean()
                 losses["uncert_log/{}".format(scale)] = log_term.mean()
-                to_optimise = stereo_reprojection_loss + div_term + log_term
 
-                # Depth smoothness on stereo image
-                mean_disp_s = disp_s.mean(2, True).mean(3, True)
-                norm_disp_s = disp_s / (mean_disp_s + 1e-7)
-                smooth_loss += get_smooth_loss(norm_disp_s, color_s)
+                to_optimise = div_term + log_term
 
             loss += to_optimise.mean()
 
-            loss += self.opt.disparity_smoothness * smooth_loss / (2 ** scale)
             total_loss += loss
             losses["loss/{}".format(scale)] = loss
 
@@ -642,16 +603,12 @@ class Trainer:
                 
                 if self.opt.uncertainty:
                     writer.add_image(
-                        "uncertainty_{}/{}".format(s, j),
-                        normalize_image(torch.exp(outputs[("uncertainty", s)][j])), self.step)
+                        "disp_uncert_{}/{}".format(s, j),
+                        normalize_image(torch.exp(outputs[("disp_uncert", s)][j])), self.step)
                     
                     writer.add_image(
-                        "color_s_pred_{}/{}".format(s, j),
-                        outputs[("color_s", 0, s)][j].data, self.step)
-                    
-                    writer.add_image(
-                        "disp_s_{}/{}".format(s, j),
-                        normalize_image(outputs[("disp_s", s)][j]), self.step)
+                        "pose_uncert_{}/{}".format(s, j),
+                        normalize_image(torch.exp(outputs[("pose_uncert", s)][j])), self.step)
 
                 if self.opt.predictive_mask:
                     for f_idx, frame_id in enumerate(self.opt.frame_ids[1:]):

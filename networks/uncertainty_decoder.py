@@ -82,6 +82,6 @@ class DepthUncertaintyDecoder(nn.Module):
 
                 if self.uncert:
                     uncerts = self.convs[("uncertconv", i)](x)
-                    self.outputs[("uncertainty", i)] = uncerts
+                    self.outputs[("disp_uncert", i)] = uncerts
 
         return self.outputs

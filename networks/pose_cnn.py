@@ -12,6 +12,8 @@ import torch.nn.functional as F
 import torchvision.ops as ops
 from collections import OrderedDict
 
+from layers import *
+
 class PoseCNN(nn.Module):
     def __init__(self, deformable_conv, uncertainty, num_input_frames):
         super(PoseCNN, self).__init__()
@@ -54,36 +56,106 @@ class PoseCNN(nn.Module):
             
             self.offset = nn.ModuleList(list(self.offset_convs.values()))
             self.mask = nn.ModuleList(list(self.mask_convs.values()))
-            self.num_deforms = len(self.offset_convs)
 
         self.convs[4] = nn.Conv2d(128, 256, 3, 2, 1)
         self.convs[5] = nn.Conv2d(256, 512, 3, 2, 1)
-        self.convs[6] = nn.Conv2d(512, 1024, 3, 2, 1)
+        self.convs[6] = nn.Conv2d(512, 1024, 3, 1, 1)
+
+        if uncertainty:
+            self.upconvs = OrderedDict()
+            self.upconvs["0_0"] = ConvBlock(1024, 512)
+            self.upconvs["0_1"] = ConvBlock(1024, 512)
+
+            self.upconvs["1_0"] = ConvBlock(512, 256)
+            self.upconvs["1_1"] = ConvBlock(512, 256)
+            
+            self.upconvs["2_0"] = ConvBlock(256, 128)
+            self.upconvs["2_1"] = ConvBlock(256, 128)
+
+            self.upconvs["3_0"] = ConvBlock(128, 64)
+            self.upconvs["3_1"] = ConvBlock(128, 64)
+            self.upconvs["3_out"] = Conv3x3(64, 1)
+
+            self.upconvs["4_0"] = ConvBlock(64, 32)
+            self.upconvs["4_1"] = ConvBlock(64, 32)
+            self.upconvs["4_out"] = Conv3x3(32, 1)
+
+            self.upconvs["5_0"] = ConvBlock(32, 16)
+            self.upconvs["5_1"] = ConvBlock(32, 16)
+            self.upconvs["5_out"] = Conv3x3(16, 1)
+
+            self.upconvs["6_0"] = ConvBlock(16, 16)
+            self.upconvs["6_1"] = ConvBlock(16, 16)
+            self.upconvs["6_out"] = Conv3x3(16, 1)
+
+            self.upconv = nn.ModuleList(list(self.upconvs.values()))
 
         self.pose_conv = nn.Conv2d(1024, 6 * (num_input_frames - 1), 1)
-
-        self.num_convs = len(self.convs)
 
         self.relu = nn.ReLU(True)
 
         self.net = nn.ModuleList(list(self.convs.values()))
 
-    def forward(self, out, uncertainty):
-        for i in range(self.num_convs):
-            if self.deformable_conv:
-                if i <= self.num_deforms - 1:
-                    att = 1 if uncertainty is None else torch.sigmoid(uncertainty[i])
-                    out = self.convs[i](out, self.offset_convs[i](out*att), torch.sigmoid(self.mask_convs[i](out*att)))
-            else:
-                out = self.convs[i](out)
-            out = self.relu(out)
+    def forward(self, out, depth_uncertainty):
+        if self.deformable_conv:
+            feat0 = self.relu(self.convs[0](out, self.offset_convs[0](out), torch.sigmoid(self.mask_convs[0](out))))
+            feat1 = self.relu(self.convs[1](feat0, self.offset_convs[1](feat0), torch.sigmoid(self.mask_convs[1](feat0))))
+            feat2 = self.relu(self.convs[2](feat1, self.offset_convs[2](feat1), torch.sigmoid(self.mask_convs[2](feat1))))
+            feat3 = self.relu(self.convs[3](feat2, self.offset_convs[3](feat2), torch.sigmoid(self.mask_convs[3](feat2))))
+        else:
+            feat0 = self.relu(self.convs[0](out))
+            feat1 = self.relu(self.convs[1](feat0))
+            feat2 = self.relu(self.convs[2](feat1))
+            feat3 = self.relu(self.convs[3](feat2))
+        
+        feat4 = self.relu(self.convs[4](feat3))
+        feat5 = self.relu(self.convs[5](feat4))
+        feat6 = self.relu(self.convs[6](feat5))
 
-        out = self.pose_conv(out)
-        out = out.mean(3).mean(2)
+        if self.uncertainty:
+            pose_uncertainty = []
+            x = self.upconvs["0_0"](feat6)
+            x = torch.cat([x, feat5], 1)
+            x = self.upconvs["0_1"](x)
 
-        out = 0.01 * out.view(-1, self.num_input_frames - 1, 1, 6)
+            x = self.upconvs["1_0"](x)
+            x = torch.cat([upsample(x), feat4], 1)
+            x = self.upconvs["1_1"](x)
 
-        axisangle = out[..., :3]
-        translation = out[..., 3:]
+            x = self.upconvs["2_0"](x)
+            x = torch.cat([upsample(x), feat3], 1)
+            x = self.upconvs["2_1"](x)
 
-        return axisangle, translation
+            x = self.upconvs["3_0"](x)
+            x = torch.cat([upsample(x), feat2], 1)
+            x = self.upconvs["3_1"](x)
+            pose_uncertainty.append(torch.sigmoid(self.upconvs["3_out"](x)))
+
+            x = self.upconvs["4_0"](x)
+            x = torch.cat([upsample(x), feat1], 1)
+            x = self.upconvs["4_1"](x)
+            pose_uncertainty.append(torch.sigmoid(self.upconvs["4_out"](x)))
+
+            x = self.upconvs["5_0"](x)
+            x = torch.cat([upsample(x), feat0], 1)
+            x = self.upconvs["5_1"](x)
+            pose_uncertainty.append(torch.sigmoid(self.upconvs["5_out"](x)))
+
+            x = self.upconvs["6_0"](x)
+            x = upsample(x)
+            x = self.upconvs["6_1"](x)
+            pose_uncertainty.append(torch.sigmoid(self.upconvs["6_out"](x)))
+            pose_uncertainty.reverse()
+
+        pose = self.pose_conv(feat6)
+        pose = pose.mean(3).mean(2)
+
+        pose = 0.01 * pose.view(-1, self.num_input_frames - 1, 1, 6)
+
+        axisangle = pose[..., :3]
+        translation = pose[..., 3:]
+
+        if self.uncertainty:
+            return axisangle, translation, pose_uncertainty
+        else:
+            return axisangle, translation, None

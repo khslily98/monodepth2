@@ -65,7 +65,7 @@ class DepthDecoder(nn.Module):
                     disp, disp_s, uncert = torch.split(out, 1, dim=1)
                     self.outputs[("disp", i)] = disp
                     self.outputs[("disp_s", i)] = disp_s
-                    self.outputs[("uncertainty", i)] = uncert
+                    self.outputs[("disp_uncert", i)] = uncert
                 else:
                     self.outputs[("disp", i)] = out
 
