@@ -24,7 +24,9 @@ class PoseCNN(nn.Module):
         self.convs = OrderedDict()
         
         if not deformable_conv:
-            self.convs[0] = nn.Conv2d(3 * num_input_frames, 16, 3, 2, 1)
+            # HS add
+            self.convs[0] = nn.Conv2d(3 * num_input_frames + 1, 16, 3, 2, 1)
+            # self.convs[0] = nn.Conv2d(3 * num_input_frames, 16, 3, 2, 1)
             self.convs[1] = nn.Conv2d(16, 32, 3, 2, 1)
             self.convs[2] = nn.Conv2d(32, 64, 3, 2, 1)
             self.convs[3] = nn.Conv2d(64, 128, 3, 2, 1)

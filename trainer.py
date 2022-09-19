@@ -308,6 +308,10 @@ class Trainer:
                     elif self.opt.pose_model_type == "posecnn":
                         pose_inputs = torch.cat(pose_inputs, 1)
 
+                        # HS add
+                        pose_inputs = [pose_inputs, disp_uncert[0]]
+                        pose_inputs = torch.cat(pose_inputs, 1)
+
                     axisangle, translation, pose_uncertainty = self.models["pose"](pose_inputs, disp_uncert)
                     outputs[("axisangle", 0, f_i)] = axisangle
                     outputs[("translation", 0, f_i)] = translation

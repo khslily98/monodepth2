@@ -10,7 +10,7 @@ import os
 import argparse
 
 file_dir = os.path.dirname(__file__)  # the directory that options.py resides in
-
+file_dir = "/mnt/server8_hard0/shkim/"
 
 class MonodepthOptions:
     def __init__(self):
@@ -211,5 +211,6 @@ class MonodepthOptions:
                                  action="store_true")
 
     def parse(self):
-        self.options = self.parser.parse_args()
+        arvs = ['--log_dir', 'checkpoints', "--model_name", "MODEL", "--pose_model_type", "posecnn", "--uncertainty"]
+        self.options = self.parser.parse_args(arvs)
         return self.options
