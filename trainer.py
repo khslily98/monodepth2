@@ -608,7 +608,7 @@ class Trainer:
                     
                     writer.add_image(
                         "pose_uncert_{}/{}".format(s, j),
-                        normalize_image(torch.exp(outputs[("pose_uncert", s)][j])), self.step)
+                        normalize_image(outputs[("pose_uncert", s)][j]), self.step)
 
                 if self.opt.predictive_mask:
                     for f_idx, frame_id in enumerate(self.opt.frame_ids[1:]):
