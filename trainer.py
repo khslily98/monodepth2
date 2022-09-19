@@ -604,7 +604,7 @@ class Trainer:
                 if self.opt.uncertainty:
                     writer.add_image(
                         "disp_uncert_{}/{}".format(s, j),
-                        normalize_image(torch.exp(outputs[("disp_uncert", s)][j])), self.step)
+                        normalize_image(outputs[("disp_uncert", s)][j]), self.step)
                     
                     writer.add_image(
                         "pose_uncert_{}/{}".format(s, j),
