@@ -3,5 +3,13 @@ __pycache__
 *_disp.jpg
 *_disp.npy
 *.npz
+*.pth
 kitti_data
 models
+checkpoints
+KITTI_odom
+KITTI_raw
+.neptune/
+.github/
+slurm_log/
+visualizations/

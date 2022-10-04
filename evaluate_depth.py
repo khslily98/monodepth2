@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from layers import disp_to_depth
-from utils import readlines
+from utils import readlines, load_training_option
 from options import MonodepthOptions
 import datasets
 import networks
@@ -74,6 +74,7 @@ def evaluate(opt):
 
         print("-> Loading weights from {}".format(opt.load_weights_folder))
 
+        opt = load_training_option(opt)
         filenames = readlines(os.path.join(splits_dir, opt.eval_split, "test_files.txt"))
         encoder_path = os.path.join(opt.load_weights_folder, "encoder.pth")
         decoder_path = os.path.join(opt.load_weights_folder, "depth.pth")
@@ -163,7 +164,7 @@ def evaluate(opt):
         quit()
 
     gt_path = os.path.join(splits_dir, opt.eval_split, "gt_depths.npz")
-    gt_depths = np.load(gt_path, fix_imports=True, encoding='latin1')["data"]
+    gt_depths = np.load(gt_path, fix_imports=True, encoding='latin1', allow_pickle=True)["data"]
 
     print("-> Evaluating")
 
@@ -222,6 +223,7 @@ def evaluate(opt):
 
     print("\n  " + ("{:>8} | " * 7).format("abs_rel", "sq_rel", "rmse", "rmse_log", "a1", "a2", "a3"))
     print(("&{: 8.3f}  " * 7).format(*mean_errors.tolist()) + "\\\\")
+    print(("{:.3f},"* 7).format(*mean_errors.tolist()))
     print("\n-> Done!")
 
 

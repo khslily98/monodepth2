@@ -9,6 +9,7 @@ import os
 import hashlib
 import zipfile
 from six.moves import urllib
+import json
 
 
 def readlines(filename):
@@ -112,3 +113,22 @@ def download_model_if_doesnt_exist(model_name):
             f.extractall(model_path)
 
         print("   Model unzipped to {}".format(model_path))
+
+
+def read_json_option(load_weights_folder):
+    json_path = os.path.join(load_weights_folder, "..", "opt.json")
+    opt = json.load(open(json_path, 'r'))
+    return opt
+
+
+def load_training_option(opt):
+    training_opt = read_json_option(opt.load_weights_folder)
+    keys_to_load = ["pose_model_input",
+                    "pose_model_type",
+                    "num_layers"]
+    for key in keys_to_load:
+        try: 
+            setattr(opt, key, training_opt[key])
+        except KeyError:
+            continue
+    return opt
