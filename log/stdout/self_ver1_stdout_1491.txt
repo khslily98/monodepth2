@@ -1,0 +1,21 @@
+Training model named:
+   self_ver1
+Models and tensorboard events files are saved to:
+   /mnt/server4_hard1/heeseon/monodepth2/checkpoints
+Training is using:
+   cuda
+Using split:
+   eigen_zhou
+There are 39810 training items and 4424 validation items
+
+Training
+epoch   0 | batch      0 | examples/s:   1.9 | loss: 0.18580 | time elapsed: 00h00m12s | time left: 00h00m00s
+epoch   0 | batch    250 | examples/s:  41.0 | loss: 0.13027 | time elapsed: 00h01m29s | time left: 08h12m32s
+epoch   0 | batch    500 | examples/s:  41.6 | loss: 0.12117 | time elapsed: 00h02m46s | time left: 07h37m06s
+epoch   0 | batch    750 | examples/s:  40.5 | loss: 0.14213 | time elapsed: 00h04m03s | time left: 07h24m05s
+epoch   0 | batch   1000 | examples/s:  44.6 | loss: 0.11315 | time elapsed: 00h05m20s | time left: 07h17m14s
+epoch   0 | batch   1250 | examples/s:  44.7 | loss: 0.11037 | time elapsed: 00h06m36s | time left: 07h11m25s
+epoch   0 | batch   1500 | examples/s:  40.0 | loss: 0.10324 | time elapsed: 00h07m52s | time left: 07h07m19s
+epoch   0 | batch   1750 | examples/s:  39.9 | loss: 0.12371 | time elapsed: 00h09m09s | time left: 07h05m09s
+epoch   0 | batch   2000 | examples/s:  40.3 | loss: 0.11009 | time elapsed: 00h10m26s | time left: 07h02m28s
+Training

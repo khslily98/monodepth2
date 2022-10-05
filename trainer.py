@@ -287,6 +287,24 @@ class Trainer:
             # Otherwise, we only feed the image with frame_id 0 through the depth encoder
             features = self.models["encoder"](inputs["color_aug", 0, 0])
             # HS add
+            loss_ssl = self.self_sup_loss(inputs, features)
+            outputs = self.models["depth"](features)
+
+        if self.opt.predictive_mask:
+            outputs["predictive_mask"] = self.models["predictive_mask"](features)
+
+        if self.use_pose_net:
+            outputs.update(self.predict_poses(inputs, features))
+
+        self.generate_images_pred(inputs, outputs)
+        losses = self.compute_losses(inputs, outputs)
+        losses["loss_ssl"] = loss_ssl
+
+        return outputs, losses
+
+
+    def self_sup_loss(self, inputs, features):
+            # HS add
             features1 = self.models["encoder"](inputs["color_aug", 1, 0])
             features2 = self.models["encoder"](inputs["color_aug", -1, 0])
             
@@ -319,27 +337,14 @@ class Trainer:
             c_diff1 = (c1 - torch.eye(D,device=self.device)).pow(2) # DxD
             # multiply off-diagonal elems of c_diff by lambda
             c_diff1[~torch.eye(D, dtype=bool)] *= 5e-3
-            loss_ssl = c_diff1.sum()
+            loss_ssl = c_diff1.sum() * 0.01
 
             # loss_kd_1 = jsd(z, z1)
             # loss_kd_2 = jsd(z, z2)
             # intra_kd_loss = loss_kd_1 + loss_kd_2
             # loss_kd = args.alpha_kl * intra_kd_loss
-
-            outputs = self.models["depth"](features)
-
-        if self.opt.predictive_mask:
-            outputs["predictive_mask"] = self.models["predictive_mask"](features)
-
-        if self.use_pose_net:
-            outputs.update(self.predict_poses(inputs, features))
-
-        self.generate_images_pred(inputs, outputs)
-        losses = self.compute_losses(inputs, outputs)
-        losses["loss_ssl"] = loss_ssl * 0.01
-
-        return outputs, losses
-
+            return loss_ssl
+            
     def predict_poses(self, inputs, features):
         """Predict poses between input frames for monocular sequences.
         """

@@ -87,7 +87,7 @@ class MonoDataset(data.Dataset):
 
         self.load_depth = self.check_depth()
 
-    def preprocess(self, inputs, color_aug):
+    def preprocess(self, inputs, color_aug, color_aug2):
         """Resize colour images to the required scales and augment if required
 
         We create the color_aug object in advance and apply the same augmentation to all
@@ -113,7 +113,15 @@ class MonoDataset(data.Dataset):
                     inputs[(n + "_aug", im, i)] = self.to_tensor(f)
                 else:
                     inputs[(n + "_aug", im, i)] = self.to_tensor(f)
-
+                    
+                # HS add
+                if type(color_aug2) is list:
+                    for aug, param in color_aug2:
+                        f = aug(f, param)
+                    inputs[(n + "_aug2", im, i)] = self.to_tensor(f)
+                else:
+                    inputs[(n + "_aug2", im, i)] = self.to_tensor(f)
+    
     def __len__(self):
         return len(self.filenames)
 
@@ -183,8 +191,11 @@ class MonoDataset(data.Dataset):
                 self.brightness, self.contrast, self.saturation, self.hue)
         else:
             color_aug = (lambda x: x)
+            
+        color_aug2 = transforms.ColorJitter.get_params(
+            self.brightness, self.contrast, self.saturation, self.hue)
 
-        self.preprocess(inputs, color_aug)
+        self.preprocess(inputs, color_aug, color_aug2)
 
         for i in self.frame_idxs:
             del inputs[("color", i, -1)]
