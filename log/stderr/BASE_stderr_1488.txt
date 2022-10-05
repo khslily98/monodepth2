@@ -1,0 +1,34 @@
+mkdir: cannot create directory ‘./backup/BASE’: File exists
+/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torchvision/transforms/transforms.py:287: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  warnings.warn(
+/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/optim/lr_scheduler.py:129: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  warnings.warn("Detected call of `lr_scheduler.step()` before `optimizer.step()`. "
+Traceback (most recent call last):
+  File "train.py", line 43, in <module>
+    trainer.train()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 189, in train
+    self.run_epoch()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 201, in run_epoch
+    for batch_idx, inputs in enumerate(self.train_loader):
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 521, in __next__
+    data = self._next_data()
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1203, in _next_data
+    return self._process_data(data)
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1229, in _process_data
+    data.reraise()
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/_utils.py", line 434, in reraise
+    raise exception
+TypeError: Caught TypeError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/_utils/worker.py", line 287, in _worker_loop
+    data = fetcher.fetch(index)
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/mnt/server4_hard1/heeseon/monodepth2/datasets/mono_dataset.py", line 181, in __getitem__
+    self.preprocess(inputs, color_aug)
+  File "/mnt/server4_hard1/heeseon/monodepth2/datasets/mono_dataset.py", line 109, in preprocess
+    inputs[(n + "_aug", im, i)] = self.to_tensor(color_aug(f))
+TypeError: 'tuple' object is not callable
+

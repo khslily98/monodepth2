@@ -1,0 +1,43 @@
+mkdir: cannot create directory ‘./backup/BASE’: File exists
+/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torchvision/transforms/transforms.py:287: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  warnings.warn(
+/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/optim/lr_scheduler.py:129: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  warnings.warn("Detected call of `lr_scheduler.step()` before `optimizer.step()`. "
+Traceback (most recent call last):
+  File "train.py", line 43, in <module>
+    trainer.train()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 189, in train
+    self.run_epoch()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 202, in run_epoch
+    for batch_idx, inputs in enumerate(self.train_loader):
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 521, in __next__
+    data = self._next_data()
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1203, in _next_data
+    return self._process_data(data)
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1229, in _process_data
+    data.reraise()
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/_utils.py", line 434, in reraise
+    raise exception
+FileNotFoundError: Caught FileNotFoundError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/_utils/worker.py", line 287, in _worker_loop
+    data = fetcher.fetch(index)
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/mnt/server4_hard1/heeseon/monodepth2/datasets/mono_dataset.py", line 161, in __getitem__
+    inputs[("color", i, -1)] = self.get_color(folder, frame_index + i, side, do_flip)
+  File "/mnt/server4_hard1/heeseon/monodepth2/datasets/kitti_dataset.py", line 50, in get_color
+    color = self.loader(self.get_image_path(folder, frame_index, side))
+  File "/mnt/server4_hard1/heeseon/monodepth2/datasets/mono_dataset.py", line 23, in pil_loader
+    with open(path, 'rb') as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/server4_hard1/heeseon/monodepth2/KITTI_raw/2011_10_03/2011_10_03_drive_0034_sync/image_02/data/0000001441.jpg'
+
+Error in atexit._run_exitfuncs:
+Traceback (most recent call last):
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/multiprocessing/popen_fork.py", line 27, in poll
+    pid, sts = os.waitpid(self.pid, flag)
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
+    _error_if_any_worker_fails()
+RuntimeError: DataLoader worker (pid 22154) is killed by signal: Terminated. 

@@ -10,7 +10,7 @@ import os
 import argparse
 
 file_dir = os.path.dirname(__file__)  # the directory that options.py resides in
-
+data_dir = "/mnt/server8_hard0/shkim/"
 
 class MonodepthOptions:
     def __init__(self):
@@ -20,7 +20,7 @@ class MonodepthOptions:
         self.parser.add_argument("--data_path",
                                  type=str,
                                  help="path to the training data",
-                                 default=os.path.join(file_dir, "KITTI_raw"))
+                                 default=os.path.join(data_dir, "KITTI_raw"))
         self.parser.add_argument("--log_dir",
                                  type=str,
                                  help="log directory",
