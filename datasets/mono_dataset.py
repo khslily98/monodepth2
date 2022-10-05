@@ -106,7 +106,13 @@ class MonoDataset(data.Dataset):
             if "color" in k:
                 n, im, i = k
                 inputs[(n, im, i)] = self.to_tensor(f)
-                inputs[(n + "_aug", im, i)] = self.to_tensor(color_aug(f))
+                # HS add
+                if type(color_aug) is list:
+                    for aug, param in color_aug:
+                        f = aug(f, param)
+                    inputs[(n + "_aug", im, i)] = self.to_tensor(f)
+                else:
+                    inputs[(n + "_aug", im, i)] = self.to_tensor(f)
 
     def __len__(self):
         return len(self.filenames)
