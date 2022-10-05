@@ -160,7 +160,7 @@ class MonodepthOptions:
         self.parser.add_argument("--save_frequency",
                                  type=int,
                                  help="number of epochs between each save",
-                                 default=5)
+                                 default=1)
         self.parser.add_argument("--neptune",
                                  help="if set upload logs to neptune ai",
                                  action="store_true")
