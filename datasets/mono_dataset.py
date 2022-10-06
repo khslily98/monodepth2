@@ -101,7 +101,7 @@ class MonoDataset(data.Dataset):
                 for i in range(self.num_scales):
                     inputs[(n, im, i)] = self.resize[i](inputs[(n, im, i - 1)])
 
-        for k in list(inputs):
+        for k in list(inputs):       
             f = inputs[k]
             if "color" in k:
                 n, im, i = k
@@ -114,13 +114,15 @@ class MonoDataset(data.Dataset):
                 else:
                     inputs[(n + "_aug", im, i)] = self.to_tensor(f)
                     
-                # HS add
+                # # HS add
                 if type(color_aug2) is list:
                     for aug, param in color_aug2:
                         f = aug(f, param)
                     inputs[(n + "_aug2", im, i)] = self.to_tensor(f)
                 else:
                     inputs[(n + "_aug2", im, i)] = self.to_tensor(f)
+                    
+                
     
     def __len__(self):
         return len(self.filenames)
@@ -187,13 +189,15 @@ class MonoDataset(data.Dataset):
             inputs[("inv_K", scale)] = torch.from_numpy(inv_K)
 
         if do_color_aug:
-            color_aug = transforms.ColorJitter.get_params(
-                self.brightness, self.contrast, self.saturation, self.hue)
+            order, *params = transforms.ColorJitter.get_params(self.brightness, self.contrast, self.saturation, self.hue)
+            aug = [(jitter, param) for jitter, param in zip(self.color_jitter, params)]
+            color_aug = [aug[order[0]], aug[order[1]], aug[order[2]], aug[order[3]]]
         else:
             color_aug = (lambda x: x)
             
-        color_aug2 = transforms.ColorJitter.get_params(
-            self.brightness, self.contrast, self.saturation, self.hue)
+        order, *params = transforms.ColorJitter.get_params(self.brightness, self.contrast, self.saturation, self.hue)
+        aug = [(jitter, param) for jitter, param in zip(self.color_jitter, params)]
+        color_aug2 = [aug[order[0]], aug[order[1]], aug[order[2]], aug[order[3]]]
 
         self.preprocess(inputs, color_aug, color_aug2)
 
