@@ -20,8 +20,8 @@ os.environ["CUDA_VISIBLE_DEVICES"]="1"
 if __name__ == "__main__":
     if opts.neptune:
         run = neptune.init(
-            project="ksh/MonoSVO",
-            api_token="eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiJkMmI1MDI3Ny0zZDIwLTRhOGMtOTQ2OS1kOGJiMTVlNDNjM2IifQ==",
+            project="khs/monoSVO-2",
+            api_token="eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiI3MGZiY2NhNS1hMWU0LTRhYmEtYmZjNy1kYzJmYzAzNzZkMmMifQ==",
             source_files=[
                 "trainer.py",
                 "networks/[A-Za-z]*.py",
