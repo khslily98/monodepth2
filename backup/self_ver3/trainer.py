@@ -287,7 +287,7 @@ class Trainer:
             # Otherwise, we only feed the image with frame_id 0 through the depth encoder
             features = self.models["encoder"](inputs["color_aug", 0, 0])
             # HS add
-            loss_ssl = self.self_sup_loss(inputs, features)
+            loss_ssl = self.self_sup_loss(inputs)
             outputs = self.models["depth"](features)
 
         if self.opt.predictive_mask:
@@ -303,41 +303,68 @@ class Trainer:
         return outputs, losses
 
 
-    def self_sup_loss(self, inputs, features):
+    def self_sup_loss(self, inputs):
             # HS add
+            features0 = self.models["encoder"](inputs["color_aug", 0, 0])
             features1 = self.models["encoder"](inputs["color_aug", 1, 0])
-            features2 = self.models["encoder"](inputs["color_aug", -1, 0])
+            features_1 = self.models["encoder"](inputs["color_aug", -1, 0])
+            features0_2 = self.models["encoder"](inputs["color_aug2", 0, 0])
+            features1_2 = self.models["encoder"](inputs["color_aug2", 1, 0])
+            features_1_2 = self.models["encoder"](inputs["color_aug2", -1, 0])
             
-            z = self.models["dense_neck"](features[-1]) # [12, 512, 6, 20] -> [12, 1, 6, 20]
+            z0 = self.models["dense_neck"](features0[-1]) # [12, 512, 6, 20] -> [12, 1, 6, 20]
             z1 = self.models["dense_neck"](features1[-1])
-            z2 = self.models["dense_neck"](features2[-1])
+            z_1 = self.models["dense_neck"](features_1[-1])
+            z0_2 = self.models["dense_neck"](features0_2[-1]) # [12, 512, 6, 20] -> [12, 1, 6, 20]
+            z1_2 = self.models["dense_neck"](features1_2[-1])
+            z_1_2 = self.models["dense_neck"](features_1_2[-1])
             
-            diff_feat0= torch.nn.functional.pairwise_distance(z, z1)
-            diff_feat1= torch.nn.functional.pairwise_distance(z, z2) # [12, 1, 6]
-
-            ##################
-            z_a_norm = (diff_feat0 - diff_feat0.mean(0)) / diff_feat0.std(0)  # NxD
-            z_b_norm = (diff_feat1 - diff_feat1.mean(0)) / diff_feat1.std(0)  # NxD
-            # z_c_norm = (z_c - z_c.mean(0)) / z_c.std(0)  # NxD
-            # z_d_norm = (z_d - z_d.mean(0)) / z_d.std(0)  # NxD
-
+            diff_feat0= torch.nn.functional.pairwise_distance(z0, z_1) # [12, 1, 6]
+            diff_feat1= torch.nn.functional.pairwise_distance(z0, z1) # [12, 1, 6]
+            diff_feat2= torch.nn.functional.pairwise_distance(z_1, z1) # [12, 1, 6]
+            diff_feat3= torch.nn.functional.pairwise_distance(z0_2, z_1_2) # [12, 1, 6]
+            diff_feat4= torch.nn.functional.pairwise_distance(z0_2, z1_2) # [12, 1, 6]
+            diff_feat5= torch.nn.functional.pairwise_distance(z_1_2, z1_2) # [12, 1, 6]
             N = diff_feat0.size(0) # 12
 
+            ##################
+            diff_feat0 = (diff_feat0 - diff_feat0.mean(0)) / diff_feat0.std(0)  # NxD
+            diff_feat1 = (diff_feat1 - diff_feat1.mean(0)) / diff_feat1.std(0)  # NxD
+            diff_feat2 = (diff_feat2 - diff_feat2.mean(0)) / diff_feat2.std(0)  # NxD
+            diff_feat3 = (diff_feat3 - diff_feat3.mean(0)) / diff_feat3.std(0)  # NxD
+            diff_feat4 = (diff_feat4 - diff_feat4.mean(0)) / diff_feat4.std(0)  # NxD
+            diff_feat5 = (diff_feat5 - diff_feat5.mean(0)) / diff_feat5.std(0)  # NxD            
+
             ## for dense activation
-            z_a_norm = z_a_norm.view(z_a_norm.size(0),  -1) # [12, 6]
-            z_b_norm = z_b_norm.view(z_b_norm.size(0),  -1)
+            diff_feat0 = diff_feat0.view(diff_feat0.size(0),  -1) # [12, 6]
+            diff_feat1 = diff_feat1.view(diff_feat1.size(0),  -1)
+            diff_feat2 = diff_feat2.view(diff_feat2.size(0),  -1)
+            diff_feat3 = diff_feat3.view(diff_feat3.size(0),  -1)
+            diff_feat4 = diff_feat4.view(diff_feat4.size(0),  -1)
+            diff_feat5 = diff_feat5.view(diff_feat5.size(0),  -1)
             
-            # HS add :edit to size(1) -> size(0)
-            D = z_a_norm.size(0) # 12
+            # HS add :edit to size(1) ver3 -> size(0) ver2
+            D = diff_feat0.size(1) # 12 
                 
-            c1 = torch.mm(z_a_norm, z_b_norm.T) / N # DxD
+            # c1 = torch.mm(diff_feat0, diff_feat3.T) / N # DxD
+            # c2 = torch.mm(diff_feat1, diff_feat4.T) / N # DxD
+            # c3 = torch.mm(diff_feat2, diff_feat5.T) / N # DxD
+            
+            c1 = torch.mm(diff_feat0.T, diff_feat3) / N # DxD
+            c2 = torch.mm(diff_feat1.T, diff_feat4) / N # DxD
+            c3 = torch.mm(diff_feat2.T, diff_feat5) / N # DxD
 
 
             # loss
             c_diff1 = (c1 - torch.eye(D,device=self.device)).pow(2) # DxD
+            c_diff2 = (c2 - torch.eye(D,device=self.device)).pow(2) # DxD
+            c_diff3 = (c3 - torch.eye(D,device=self.device)).pow(2) # DxD
             # multiply off-diagonal elems of c_diff by lambda
             c_diff1[~torch.eye(D, dtype=bool)] *= 5e-3
-            loss_ssl = c_diff1.sum() * 0.01
+            c_diff2[~torch.eye(D, dtype=bool)] *= 5e-3
+            c_diff3[~torch.eye(D, dtype=bool)] *= 5e-3
+            
+            loss_ssl = (c_diff1.sum() + c_diff2.sum() +c_diff3.sum() ) * 0.01
 
             # loss_kd_1 = jsd(z, z1)
             # loss_kd_2 = jsd(z, z2)

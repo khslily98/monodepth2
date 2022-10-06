@@ -1,0 +1,84 @@
+Training model named:
+   self_ver2
+Models and tensorboard events files are saved to:
+   /mnt/server4_hard1/heeseon/monodepth2/checkpoints
+Training is using:
+   cuda
+Using split:
+   eigen_zhou
+There are 39810 training items and 4424 validation items
+
+Training
+epoch   0 | batch      0 | examples/s:   1.4 | loss: 0.13345 | time elapsed: 00h00m17s | time left: 00h00m00s
+epoch   0 | batch    250 | examples/s:  32.2 | loss: 0.15226 | time elapsed: 00h02m05s | time left: 11h33m40s
+epoch   0 | batch    500 | examples/s:  30.1 | loss: 0.13306 | time elapsed: 00h04m01s | time left: 11h03m32s
+epoch   0 | batch    750 | examples/s:  25.7 | loss: 0.12370 | time elapsed: 00h06m12s | time left: 11h20m30s
+epoch   0 | batch   1000 | examples/s:  26.6 | loss: 0.11840 | time elapsed: 00h08m34s | time left: 11h42m56s
+epoch   0 | batch   1250 | examples/s:  26.5 | loss: 0.12230 | time elapsed: 00h10m56s | time left: 11h54m32s
+epoch   0 | batch   1500 | examples/s:  30.8 | loss: 0.10575 | time elapsed: 00h13m18s | time left: 12h02m34s
+epoch   0 | batch   1750 | examples/s:  24.3 | loss: 0.10416 | time elapsed: 00h15m40s | time left: 12h07m03s
+epoch   0 | batch   2000 | examples/s:  31.8 | loss: 0.11437 | time elapsed: 00h17m59s | time left: 12h08m09s
+Training
+epoch   1 | batch    683 | examples/s:  23.5 | loss: 0.09766 | time elapsed: 00h36m25s | time left: 11h58m40s
+epoch   1 | batch   2683 | examples/s:  20.7 | loss: 0.11350 | time elapsed: 00h54m21s | time left: 11h36m50s
+Training
+epoch   2 | batch   1366 | examples/s:  24.4 | loss: 0.09542 | time elapsed: 01h12m24s | time left: 11h18m09s
+Training
+epoch   3 | batch     49 | examples/s:  25.9 | loss: 0.09374 | time elapsed: 01h30m50s | time left: 11h02m27s
+epoch   3 | batch   2049 | examples/s:  23.3 | loss: 0.10516 | time elapsed: 01h48m49s | time left: 10h43m13s
+Training
+epoch   4 | batch    732 | examples/s:  22.5 | loss: 0.10685 | time elapsed: 02h06m42s | time left: 10h23m49s
+epoch   4 | batch   2732 | examples/s:  22.9 | loss: 0.09780 | time elapsed: 02h24m17s | time left: 10h03m30s
+Training
+epoch   5 | batch   1415 | examples/s:  28.7 | loss: 0.09612 | time elapsed: 02h42m14s | time left: 09h45m12s
+Training
+epoch   6 | batch     98 | examples/s:  27.7 | loss: 0.09584 | time elapsed: 03h00m30s | time left: 09h27m54s
+epoch   6 | batch   2098 | examples/s:  26.2 | loss: 0.09044 | time elapsed: 03h18m30s | time left: 09h09m43s
+Training
+epoch   7 | batch    781 | examples/s:  21.7 | loss: 0.09530 | time elapsed: 03h37m09s | time left: 08h53m10s
+epoch   7 | batch   2781 | examples/s:  25.2 | loss: 0.09205 | time elapsed: 03h54m42s | time left: 08h33m52s
+Training
+epoch   8 | batch   1464 | examples/s:  21.0 | loss: 0.08774 | time elapsed: 04h12m52s | time left: 08h16m02s
+Training
+epoch   9 | batch    147 | examples/s:  30.0 | loss: 0.07767 | time elapsed: 04h30m54s | time left: 07h57m55s
+epoch   9 | batch   2147 | examples/s:  24.3 | loss: 0.10148 | time elapsed: 04h49m09s | time left: 07h40m09s
+Training
+epoch  10 | batch    830 | examples/s:  28.4 | loss: 0.08211 | time elapsed: 05h06m54s | time left: 07h21m37s
+epoch  10 | batch   2830 | examples/s:  26.3 | loss: 0.10323 | time elapsed: 05h25m08s | time left: 07h03m48s
+Training
+epoch  11 | batch   1513 | examples/s:  27.2 | loss: 0.08697 | time elapsed: 05h43m28s | time left: 06h46m04s
+Training
+epoch  12 | batch    196 | examples/s:  27.5 | loss: 0.08658 | time elapsed: 06h01m47s | time left: 06h28m14s
+epoch  12 | batch   2196 | examples/s:  18.0 | loss: 0.08168 | time elapsed: 06h19m48s | time left: 06h10m05s
+Training
+epoch  13 | batch    879 | examples/s:  29.2 | loss: 0.08757 | time elapsed: 06h37m47s | time left: 05h51m54s
+epoch  13 | batch   2879 | examples/s:  24.5 | loss: 0.07984 | time elapsed: 06h55m39s | time left: 05h33m39s
+Training
+epoch  14 | batch   1562 | examples/s:  21.8 | loss: 0.07651 | time elapsed: 07h13m29s | time left: 05h15m24s
+Training
+epoch  15 | batch    245 | examples/s:  25.3 | loss: 0.09905 | time elapsed: 07h31m22s | time left: 04h57m13s
+epoch  15 | batch   2245 | examples/s:  27.4 | loss: 0.09185 | time elapsed: 07h47m38s | time left: 04h38m06s
+Training
+epoch  16 | batch    928 | examples/s:  24.4 | loss: 0.08851 | time elapsed: 08h02m55s | time left: 04h18m40s
+epoch  16 | batch   2928 | examples/s:  31.6 | loss: 0.09166 | time elapsed: 08h18m01s | time left: 03h59m26s
+Training
+epoch  17 | batch   1611 | examples/s:  30.4 | loss: 0.08808 | time elapsed: 08h32m56s | time left: 03h40m26s
+Training
+epoch  18 | batch    294 | examples/s:  27.2 | loss: 0.08098 | time elapsed: 08h48m05s | time left: 03h21m46s
+epoch  18 | batch   2294 | examples/s:  28.3 | loss: 0.07457 | time elapsed: 09h03m02s | time left: 03h03m16s
+Training
+epoch  19 | batch    977 | examples/s:  26.9 | loss: 0.07915 | time elapsed: 09h17m58s | time left: 02h44m59s
+epoch  19 | batch   2977 | examples/s:  24.2 | loss: 0.08528 | time elapsed: 09h32m50s | time left: 02h26m53s
+Training
+epoch  20 | batch   1660 | examples/s:  24.2 | loss: 0.08888 | time elapsed: 09h48m20s | time left: 02h09m08s
+Training
+epoch  21 | batch    343 | examples/s:  24.5 | loss: 0.07031 | time elapsed: 10h03m43s | time left: 01h51m28s
+epoch  21 | batch   2343 | examples/s:  30.2 | loss: 0.06665 | time elapsed: 10h18m43s | time left: 01h33m53s
+Training
+epoch  22 | batch   1026 | examples/s:  27.8 | loss: 0.09170 | time elapsed: 10h33m40s | time left: 01h16m25s
+epoch  22 | batch   3026 | examples/s:  27.7 | loss: 0.08197 | time elapsed: 10h48m23s | time left: 00h59m04s
+Training
+epoch  23 | batch   1709 | examples/s:  31.9 | loss: 0.06865 | time elapsed: 11h03m03s | time left: 00h41m51s
+Training
+epoch  24 | batch    392 | examples/s:  23.6 | loss: 0.07355 | time elapsed: 11h17m56s | time left: 00h24m47s
+epoch  24 | batch   2392 | examples/s:  26.6 | loss: 0.07599 | time elapsed: 11h33m24s | time left: 00h07m49s
