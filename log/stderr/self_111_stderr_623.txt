@@ -1,0 +1,7 @@
+mkdir: cannot create directory ‘./backup/self_111’: File exists
+Traceback (most recent call last):
+  File "train.py", line 9, in <module>
+    from trainer import Trainer
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 16, in <module>
+    from tensorboardX import SummaryWriter
+ModuleNotFoundError: No module named 'tensorboardX'

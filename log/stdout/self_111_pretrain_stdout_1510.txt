@@ -1,0 +1,17 @@
+loading model from folder ./checkpoints/self_100/models/weights_20
+Loading encoder weights...
+Loading depth weights...
+Loading pose_encoder weights...
+Loading pose weights...
+Loading Adam weights
+Training model named:
+   finetuned_100
+Models and tensorboard events files are saved to:
+   /mnt/server4_hard1/heeseon/monodepth2/checkpoints
+Training is using:
+   cuda
+Using split:
+   eigen_zhou
+There are 39810 training items and 4424 validation items
+
+Training

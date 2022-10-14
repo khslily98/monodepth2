@@ -30,7 +30,7 @@ class MonodepthOptions:
         self.parser.add_argument("--model_name",
                                  type=str,
                                  help="the name of the folder to save the model in",
-                                 default="mdp")
+                                 default="BASE_recurrent1")
         self.parser.add_argument("--split",
                                  type=str,
                                  help="which training split to use",

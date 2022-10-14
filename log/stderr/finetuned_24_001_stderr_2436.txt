@@ -1,0 +1,15 @@
+mkdir: cannot create directory ‘./backup/finetuned_24_001’: File exists
+cp: cannot create regular file './backup/finetuned_24_001/trainer.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/kitti_dataset.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/mono_dataset.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/denseclneck.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/depth_decoder.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/pose_cnn.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/pose_decoder.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/resnet_encoder.py': Permission denied
+Traceback (most recent call last):
+  File "train.py", line 9, in <module>
+    from trainer import Trainer
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 16, in <module>
+    from tensorboardX import SummaryWriter
+ModuleNotFoundError: No module named 'tensorboardX'

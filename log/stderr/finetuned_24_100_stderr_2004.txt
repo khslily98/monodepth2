@@ -1,0 +1,28 @@
+mkdir: cannot create directory ‘./backup/finetuned_24_100’: File exists
+/home/cilab3/anaconda3/envs/ODI/lib/python3.8/site-packages/torchvision/transforms/transforms.py:287: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  warnings.warn(
+/home/cilab3/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/optim/lr_scheduler.py:129: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  warnings.warn("Detected call of `lr_scheduler.step()` before `optimizer.step()`. "
+Traceback (most recent call last):
+  File "train.py", line 47, in <module>
+    trainer.train()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 227, in train
+    self.run_epoch()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 239, in run_epoch
+    for batch_idx, inputs in enumerate(self.train_loader):
+  File "/home/cilab3/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 521, in __next__
+    data = self._next_data()
+  File "/home/cilab3/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1186, in _next_data
+    idx, data = self._get_data()
+  File "/home/cilab3/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1142, in _get_data
+    success, data = self._try_get_data()
+  File "/home/cilab3/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 990, in _try_get_data
+    data = self._data_queue.get(timeout=timeout)
+  File "/home/cilab3/anaconda3/envs/ODI/lib/python3.8/queue.py", line 179, in get
+    self.not_empty.wait(remaining)
+  File "/home/cilab3/anaconda3/envs/ODI/lib/python3.8/threading.py", line 306, in wait
+    gotit = waiter.acquire(True, timeout)
+  File "/home/cilab3/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
+    _error_if_any_worker_fails()
+RuntimeError: DataLoader worker (pid 11709) is killed by signal: Killed. 
+/var/spool/slurmd/job02004/slurm_script: line 19: 11460 Segmentation fault      (core dumped) python train.py --model_name $SLURM_JOB_NAME --load_weights_folder ./checkpoints/self_100/models/weights_24

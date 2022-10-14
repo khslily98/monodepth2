@@ -1,0 +1,65 @@
+mkdir: cannot create directory ‘./backup/self_111’: File exists
+Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /home/heeseon/.cache/torch/hub/checkpoints/resnet18-f37072fd.pth
+  0%|          | 0.00/44.7M [00:00<?, ?B/s]  1%|          | 456k/44.7M [00:00<00:09, 4.66MB/s]  3%|▎         | 1.36M/44.7M [00:00<00:06, 7.49MB/s]  5%|▌         | 2.28M/44.7M [00:00<00:05, 8.41MB/s]  7%|▋         | 3.18M/44.7M [00:00<00:04, 8.76MB/s]  9%|▉         | 4.08M/44.7M [00:00<00:04, 8.94MB/s] 11%|█         | 4.98M/44.7M [00:00<00:04, 9.11MB/s] 13%|█▎        | 5.91M/44.7M [00:00<00:04, 9.24MB/s] 15%|█▌        | 6.81M/44.7M [00:00<00:04, 9.27MB/s] 17%|█▋        | 7.72M/44.7M [00:00<00:04, 9.31MB/s] 19%|█▉        | 8.63M/44.7M [00:01<00:04, 9.40MB/s] 21%|██▏       | 9.53M/44.7M [00:01<00:03, 9.36MB/s] 23%|██▎       | 10.4M/44.7M [00:01<00:03, 9.37MB/s] 25%|██▌       | 11.4M/44.7M [00:01<00:03, 9.43MB/s] 27%|██▋       | 12.3M/44.7M [00:01<00:03, 9.41MB/s] 30%|██▉       | 13.2M/44.7M [00:01<00:03, 9.44MB/s] 32%|███▏      | 14.1M/44.7M [00:01<00:03, 9.42MB/s] 34%|███▎      | 15.0M/44.7M [00:01<00:03, 9.41MB/s] 36%|███▌      | 15.9M/44.7M [00:01<00:03, 9.43MB/s] 38%|███▊      | 16.8M/44.7M [00:01<00:03, 9.43MB/s] 40%|███▉      | 17.7M/44.7M [00:02<00:03, 9.41MB/s] 42%|████▏     | 18.7M/44.7M [00:02<00:02, 9.44MB/s] 44%|████▍     | 19.6M/44.7M [00:02<00:02, 9.42MB/s] 46%|████▌     | 20.5M/44.7M [00:02<00:02, 9.44MB/s] 48%|████▊     | 21.4M/44.7M [00:02<00:02, 9.42MB/s] 50%|████▉     | 22.3M/44.7M [00:02<00:02, 9.44MB/s] 52%|█████▏    | 23.2M/44.7M [00:02<00:02, 9.42MB/s] 54%|█████▍    | 24.1M/44.7M [00:02<00:02, 9.45MB/s] 56%|█████▌    | 25.0M/44.7M [00:02<00:02, 9.42MB/s] 58%|█████▊    | 25.9M/44.7M [00:02<00:02, 9.42MB/s] 60%|██████    | 26.9M/44.7M [00:03<00:01, 9.40MB/s] 62%|██████▏   | 27.8M/44.7M [00:03<00:01, 9.44MB/s] 64%|██████▍   | 28.7M/44.7M [00:03<00:01, 9.41MB/s] 66%|██████▋   | 29.6M/44.7M [00:03<00:01, 9.44MB/s] 68%|██████▊   | 30.5M/44.7M [00:03<00:01, 9.42MB/s] 70%|███████   | 31.4M/44.7M [00:03<00:01, 9.47MB/s] 72%|███████▏  | 32.3M/44.7M [00:03<00:01, 9.43MB/s] 74%|███████▍  | 33.2M/44.7M [00:03<00:01, 9.43MB/s] 76%|███████▋  | 34.2M/44.7M [00:03<00:01, 9.44MB/s] 79%|███████▊  | 35.1M/44.7M [00:03<00:01, 9.44MB/s] 81%|████████  | 36.0M/44.7M [00:04<00:00, 9.46MB/s] 83%|████████▎ | 36.9M/44.7M [00:04<00:00, 9.43MB/s] 85%|████████▍ | 37.8M/44.7M [00:04<00:00, 9.45MB/s] 87%|████████▋ | 38.7M/44.7M [00:04<00:00, 9.43MB/s] 89%|████████▉ | 39.6M/44.7M [00:04<00:00, 9.45MB/s] 91%|█████████ | 40.6M/44.7M [00:04<00:00, 9.42MB/s] 93%|█████████▎| 41.5M/44.7M [00:04<00:00, 9.45MB/s] 95%|█████████▍| 42.4M/44.7M [00:04<00:00, 9.42MB/s] 97%|█████████▋| 43.3M/44.7M [00:04<00:00, 9.45MB/s] 99%|█████████▉| 44.2M/44.7M [00:04<00:00, 9.42MB/s]100%|██████████| 44.7M/44.7M [00:05<00:00, 9.33MB/s]
+/home/cilab10/anaconda3/envs/SEP/lib/python3.7/site-packages/torch/cuda/__init__.py:106: UserWarning: 
+NVIDIA GeForce RTX 3090 with CUDA capability sm_86 is not compatible with the current PyTorch installation.
+The current PyTorch install supports CUDA capabilities sm_37 sm_50 sm_60 sm_61 sm_70 sm_75 compute_37.
+If you want to use the NVIDIA GeForce RTX 3090 GPU with PyTorch, please check the instructions at https://pytorch.org/get-started/locally/
+
+  warnings.warn(incompatible_device_warn.format(device_name, capability, " ".join(arch_list), device_name))
+/home/cilab10/anaconda3/envs/SEP/lib/python3.7/site-packages/torchvision/transforms/transforms.py:281: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/cilab10/anaconda3/envs/SEP/lib/python3.7/site-packages/torch/optim/lr_scheduler.py:134: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  "https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate", UserWarning)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+[W pthreadpool-cpp.cc:90] Warning: Leaking Caffe2 thread-pool after fork. (function pthreadpool)
+Traceback (most recent call last):
+  File "train.py", line 46, in <module>
+    trainer.train()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 227, in train
+    self.run_epoch()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 243, in run_epoch
+    outputs, losses = self.process_batch(inputs)
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 304, in process_batch
+    features = self.models["encoder"](inputs["color_aug", 0, 0])
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1051, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/mnt/server4_hard1/heeseon/monodepth2/networks/resnet_encoder.py", line 91, in forward
+    x = self.encoder.bn1(x)
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1051, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/site-packages/torch/nn/modules/batchnorm.py", line 178, in forward
+    self.eps,
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/site-packages/torch/nn/functional.py", line 2282, in batch_norm
+    input, weight, bias, running_mean, running_var, training, momentum, eps, torch.backends.cudnn.enabled
+RuntimeError: cuDNN error: CUDNN_STATUS_EXECUTION_FAILED
+Exception in thread Thread-2:
+Traceback (most recent call last):
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/threading.py", line 926, in _bootstrap_inner
+    self.run()
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/threading.py", line 870, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/site-packages/torch/utils/data/_utils/pin_memory.py", line 28, in _pin_memory_loop
+    r = in_queue.get(timeout=MP_STATUS_CHECK_INTERVAL)
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/multiprocessing/queues.py", line 113, in get
+    return _ForkingPickler.loads(res)
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/site-packages/torch/multiprocessing/reductions.py", line 289, in rebuild_storage_fd
+    fd = df.detach()
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/multiprocessing/resource_sharer.py", line 58, in detach
+    return reduction.recv_handle(conn)
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/multiprocessing/reduction.py", line 185, in recv_handle
+    return recvfds(s, 1)[0]
+  File "/home/cilab10/anaconda3/envs/SEP/lib/python3.7/multiprocessing/reduction.py", line 153, in recvfds
+    msg, ancdata, flags, addr = sock.recvmsg(1, socket.CMSG_SPACE(bytes_size))
+ConnectionResetError: [Errno 104] Connection reset by peer
+

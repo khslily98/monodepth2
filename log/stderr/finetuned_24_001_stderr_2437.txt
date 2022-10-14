@@ -1,0 +1,38 @@
+mkdir: cannot create directory ‘./backup/finetuned_24_001’: File exists
+cp: cannot create regular file './backup/finetuned_24_001/trainer.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/kitti_dataset.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/mono_dataset.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/denseclneck.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/depth_decoder.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/pose_cnn.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/pose_decoder.py': Permission denied
+cp: cannot create regular file './backup/finetuned_24_001/resnet_encoder.py': Permission denied
+/home/cilab2/anaconda3/envs/odi_env/lib/python3.6/site-packages/torchvision/transforms/transforms.py:281: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+Traceback (most recent call last):
+  File "/home/cilab2/anaconda3/envs/odi_env/lib/python3.6/site-packages/tensorboardX/record_writer.py", line 58, in open_file
+    factory = REGISTERED_FACTORIES[prefix]
+KeyError: '/mnt/server4_hard1/heeseon/monodepth2/checkpoints/finetuned_24_001/train/events.out.tfevents.1665475227.server2'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "train.py", line 46, in <module>
+    trainer = Trainer(opts)
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 181, in __init__
+    self.writers[mode] = SummaryWriter(os.path.join(self.log_path, mode))
+  File "/home/cilab2/anaconda3/envs/odi_env/lib/python3.6/site-packages/tensorboardX/writer.py", line 301, in __init__
+    self._get_file_writer()
+  File "/home/cilab2/anaconda3/envs/odi_env/lib/python3.6/site-packages/tensorboardX/writer.py", line 353, in _get_file_writer
+    **self.kwargs)
+  File "/home/cilab2/anaconda3/envs/odi_env/lib/python3.6/site-packages/tensorboardX/writer.py", line 106, in __init__
+    logdir, max_queue, flush_secs, filename_suffix)
+  File "/home/cilab2/anaconda3/envs/odi_env/lib/python3.6/site-packages/tensorboardX/event_file_writer.py", line 107, in __init__
+    self._logdir, "events"), filename_suffix)
+  File "/home/cilab2/anaconda3/envs/odi_env/lib/python3.6/site-packages/tensorboardX/event_file_writer.py", line 43, in __init__
+    self._py_recordio_writer = RecordWriter(self._file_name)
+  File "/home/cilab2/anaconda3/envs/odi_env/lib/python3.6/site-packages/tensorboardX/record_writer.py", line 179, in __init__
+    self._writer = open_file(path)
+  File "/home/cilab2/anaconda3/envs/odi_env/lib/python3.6/site-packages/tensorboardX/record_writer.py", line 61, in open_file
+    return open(path, 'wb')
+PermissionError: [Errno 13] Permission denied: '/mnt/server4_hard1/heeseon/monodepth2/checkpoints/finetuned_24_001/train/events.out.tfevents.1665475227.server2'

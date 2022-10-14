@@ -1,0 +1,11 @@
+mkdir: cannot create directory ‘./backup/BASE_recurrent1’: File exists
+Traceback (most recent call last):
+  File "train.py", line 48, in <module>
+    trainer = Trainer(opts)
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 148, in __init__
+    self.load_model()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 892, in load_model
+    self.model_optimizer.load_state_dict(optimizer_dict)
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/optim/optimizer.py", line 146, in load_state_dict
+    raise ValueError("loaded state dict contains a parameter group "
+ValueError: loaded state dict contains a parameter group that doesn't match the size of optimizer's group

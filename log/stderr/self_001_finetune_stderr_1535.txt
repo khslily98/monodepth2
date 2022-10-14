@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "train.py", line 48, in <module>
+    trainer = Trainer(opts)
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 148, in __init__
+    self.load_model()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 880, in load_model
+    assert os.path.isdir(self.opt.load_weights_folder), \
+AssertionError: Cannot find folder ./checkpoints/self_001_pretrain/models/weights_24

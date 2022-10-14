@@ -1,0 +1,90 @@
+loading model from folder ./checkpoints/self_100/models/weights_24
+Loading encoder weights...
+Loading depth weights...
+Loading pose_encoder weights...
+Loading pose weights...
+Loading Adam weights
+Training model named:
+   finetuned_24_100
+Models and tensorboard events files are saved to:
+   /mnt/server4_hard1/heeseon/monodepth2/checkpoints
+Training is using:
+   cuda
+Using split:
+   eigen_zhou
+There are 39810 training items and 4424 validation items
+
+Training
+epoch   0 | batch      0 | examples/s:   4.1 | loss: 0.08237 | time elapsed: 00h00m14s | time left: 00h00m00s
+epoch   0 | batch    250 | examples/s:  35.2 | loss: 0.08042 | time elapsed: 00h13m18s | time left: 73h21m42s
+epoch   0 | batch    500 | examples/s:  35.2 | loss: 0.06418 | time elapsed: 00h16m55s | time left: 46h31m11s
+epoch   0 | batch    750 | examples/s:  29.8 | loss: 0.07765 | time elapsed: 00h20m42s | time left: 37h48m10s
+epoch   0 | batch   1000 | examples/s:  34.9 | loss: 0.07920 | time elapsed: 00h24m32s | time left: 33h30m58s
+epoch   0 | batch   1250 | examples/s:  27.8 | loss: 0.07430 | time elapsed: 00h28m23s | time left: 30h55m29s
+epoch   0 | batch   1500 | examples/s:  31.6 | loss: 0.08016 | time elapsed: 00h31m48s | time left: 28h46m20s
+epoch   0 | batch   1750 | examples/s:  34.9 | loss: 0.08163 | time elapsed: 00h35m12s | time left: 27h13m31s
+epoch   0 | batch   2000 | examples/s:  28.5 | loss: 0.06268 | time elapsed: 00h38m38s | time left: 26h03m15s
+Training
+epoch   1 | batch    683 | examples/s:  35.2 | loss: 0.07576 | time elapsed: 01h05m38s | time left: 21h35m11s
+epoch   1 | batch   2683 | examples/s:  33.2 | loss: 0.06831 | time elapsed: 01h31m57s | time left: 19h39m00s
+Training
+epoch   2 | batch   1366 | examples/s:  34.1 | loss: 0.07407 | time elapsed: 01h57m46s | time left: 18h23m03s
+Training
+epoch   3 | batch     49 | examples/s:  34.6 | loss: 0.07393 | time elapsed: 02h23m51s | time left: 17h29m04s
+epoch   3 | batch   2049 | examples/s:  35.0 | loss: 0.07575 | time elapsed: 02h50m16s | time left: 16h46m23s
+Training
+epoch   4 | batch    732 | examples/s:  35.2 | loss: 0.08124 | time elapsed: 03h17m52s | time left: 16h14m09s
+epoch   4 | batch   2732 | examples/s:  35.0 | loss: 0.07263 | time elapsed: 03h44m22s | time left: 15h38m31s
+Training
+epoch   5 | batch   1415 | examples/s:  32.3 | loss: 0.06724 | time elapsed: 04h09m14s | time left: 14h59m01s
+Training
+epoch   6 | batch     98 | examples/s:  32.1 | loss: 0.06770 | time elapsed: 04h40m15s | time left: 14h41m47s
+epoch   6 | batch   2098 | examples/s:  30.9 | loss: 0.06472 | time elapsed: 05h06m41s | time left: 14h09m19s
+Training
+epoch   7 | batch    781 | examples/s:  34.9 | loss: 0.06971 | time elapsed: 05h31m19s | time left: 13h33m28s
+epoch   7 | batch   2781 | examples/s:  35.0 | loss: 0.07993 | time elapsed: 05h56m55s | time left: 13h01m26s
+Training
+epoch   8 | batch   1464 | examples/s:  32.4 | loss: 0.08406 | time elapsed: 06h23m18s | time left: 12h31m54s
+Training
+epoch   9 | batch    147 | examples/s:  35.1 | loss: 0.06998 | time elapsed: 06h49m58s | time left: 12h03m16s
+epoch   9 | batch   2147 | examples/s:  28.7 | loss: 0.06809 | time elapsed: 07h16m42s | time left: 11h34m58s
+Training
+epoch  10 | batch    830 | examples/s:  31.1 | loss: 0.07600 | time elapsed: 07h42m01s | time left: 11h04m50s
+epoch  10 | batch   2830 | examples/s:  31.7 | loss: 0.07593 | time elapsed: 08h07m47s | time left: 10h35m48s
+Training
+epoch  11 | batch   1513 | examples/s:  35.2 | loss: 0.06753 | time elapsed: 08h32m58s | time left: 10h06m27s
+Training
+epoch  12 | batch    196 | examples/s:  35.2 | loss: 0.06718 | time elapsed: 09h15m56s | time left: 09h56m35s
+epoch  12 | batch   2196 | examples/s:  27.8 | loss: 0.08153 | time elapsed: 09h40m45s | time left: 09h25m53s
+Training
+epoch  13 | batch    879 | examples/s:  35.0 | loss: 0.07842 | time elapsed: 10h03m52s | time left: 08h54m13s
+epoch  13 | batch   2879 | examples/s:  35.1 | loss: 0.08147 | time elapsed: 10h26m43s | time left: 08h23m04s
+Training
+epoch  14 | batch   1562 | examples/s:  34.8 | loss: 0.07688 | time elapsed: 10h49m34s | time left: 07h52m38s
+Training
+epoch  15 | batch    245 | examples/s:  33.5 | loss: 0.07525 | time elapsed: 11h13m45s | time left: 07h23m40s
+epoch  15 | batch   2245 | examples/s:  34.4 | loss: 0.07625 | time elapsed: 11h36m45s | time left: 06h54m22s
+Training
+epoch  16 | batch    928 | examples/s:  34.9 | loss: 0.06822 | time elapsed: 11h59m24s | time left: 06h25m20s
+epoch  16 | batch   2928 | examples/s:  28.1 | loss: 0.06805 | time elapsed: 12h22m06s | time left: 05h56m48s
+Training
+epoch  17 | batch   1611 | examples/s:  34.5 | loss: 0.06678 | time elapsed: 12h44m44s | time left: 05h28m38s
+Training
+epoch  18 | batch    294 | examples/s:  34.4 | loss: 0.06634 | time elapsed: 13h07m41s | time left: 05h00m58s
+epoch  18 | batch   2294 | examples/s:  35.0 | loss: 0.06767 | time elapsed: 13h30m09s | time left: 04h33m25s
+Training
+epoch  19 | batch    977 | examples/s:  33.2 | loss: 0.07012 | time elapsed: 13h52m53s | time left: 04h06m17s
+epoch  19 | batch   2977 | examples/s:  35.1 | loss: 0.07766 | time elapsed: 14h15m44s | time left: 03h39m26s
+Training
+epoch  20 | batch   1660 | examples/s:  30.1 | loss: 0.06688 | time elapsed: 14h38m35s | time left: 03h12m50s
+Training
+epoch  21 | batch    343 | examples/s:  34.9 | loss: 0.07612 | time elapsed: 15h01m24s | time left: 02h46m26s
+epoch  21 | batch   2343 | examples/s:  32.2 | loss: 0.07320 | time elapsed: 15h23m52s | time left: 02h20m11s
+Training
+epoch  22 | batch   1026 | examples/s:  35.0 | loss: 0.07648 | time elapsed: 15h46m45s | time left: 01h54m11s
+epoch  22 | batch   3026 | examples/s:  33.1 | loss: 0.07182 | time elapsed: 16h09m46s | time left: 01h28m21s
+Training
+epoch  23 | batch   1709 | examples/s:  31.1 | loss: 0.08017 | time elapsed: 16h32m44s | time left: 01h02m40s
+Training
+epoch  24 | batch    392 | examples/s:  35.1 | loss: 0.07749 | time elapsed: 16h56m54s | time left: 00h37m10s
+epoch  24 | batch   2392 | examples/s:  34.6 | loss: 0.07653 | time elapsed: 17h21m17s | time left: 00h11m44s

@@ -1,0 +1,9 @@
+mkdir: cannot create directory ‘./backup/finetuned_24_100’: File exists
+Traceback (most recent call last):
+  File "train.py", line 46, in <module>
+    trainer = Trainer(opts)
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 145, in __init__
+    self.load_model()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 846, in load_model
+    assert os.path.isdir(self.opt.load_weights_folder), \
+AssertionError: Cannot find folder ./checkpoints/self_100/models/weights_24

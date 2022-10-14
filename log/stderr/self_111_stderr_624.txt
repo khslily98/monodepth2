@@ -1,0 +1,11 @@
+mkdir: cannot create directory ‘./backup/self_111’: File exists
+Traceback (most recent call last):
+  File "train.py", line 9, in <module>
+    from trainer import Trainer
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 24, in <module>
+    import datasets
+  File "/mnt/server4_hard1/heeseon/monodepth2/datasets/__init__.py", line 1, in <module>
+    from .kitti_dataset import KITTIRAWDataset, KITTIOdomDataset, KITTIDepthDataset
+  File "/mnt/server4_hard1/heeseon/monodepth2/datasets/kitti_dataset.py", line 10, in <module>
+    import skimage.transform
+ModuleNotFoundError: No module named 'skimage'

@@ -1,0 +1,5 @@
+mkdir: cannot create directory ‘./backup/self_111’: File exists
+Traceback (most recent call last):
+  File "train.py", line 11, in <module>
+    import neptune.new as neptune
+ModuleNotFoundError: No module named 'neptune'

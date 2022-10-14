@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "train.py", line 49, in <module>
+    trainer.train()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 230, in train
+    self.run_epoch()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 246, in run_epoch
+    outputs, losses = self.process_batch(inputs)
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 370, in process_batch
+    losses = self.self_sup_loss(inputs, losses)
+TypeError: self_sup_loss() missing 4 required positional arguments: 'losses', 'loss1', 'loss2', and 'loss3'

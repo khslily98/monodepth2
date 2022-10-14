@@ -13,9 +13,12 @@ import neptune.new as neptune
 options = MonodepthOptions()
 opts = options.parse()
 import os
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   
-os.environ["CUDA_VISIBLE_DEVICES"]="3"
+# os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   
+# os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
+# python train.py --model_name finetuned_100 --load_weights_folder ./checkpoints/self_100/models/weights_20
+import warnings
+warnings.filterwarnings(action='ignore')
 
 if __name__ == "__main__":
     if opts.neptune:

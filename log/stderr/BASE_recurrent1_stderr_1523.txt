@@ -1,0 +1,17 @@
+mkdir: cannot create directory ‘./backup/BASE_recurrent1’: File exists
+Traceback (most recent call last):
+  File "train.py", line 49, in <module>
+    trainer.train()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 230, in train
+    self.run_epoch()
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 246, in run_epoch
+    outputs, losses = self.process_batch(inputs)
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 343, in process_batch
+    self.generate_images_pred(inputs, outputs)
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 641, in generate_images_pred
+    cam_points = self.backproject_depth[source_scale](
+  File "/home/cilab4/anaconda3/envs/ODI/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/mnt/server4_hard1/heeseon/monodepth2/layers.py", line 165, in forward
+    cam_points = depth.view(self.batch_size, 1, -1) * cam_points
+RuntimeError: CUDA out of memory. Tried to allocate 18.00 MiB (GPU 0; 23.70 GiB total capacity; 4.04 GiB already allocated; 9.81 MiB free; 4.11 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF

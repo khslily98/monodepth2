@@ -15,8 +15,9 @@ mkdir ./backup/$SLURM_JOB_NAME
 cp trainer.py ./backup/$SLURM_JOB_NAME
 cp datasets/[A-Za-z]*.py ./backup/$SLURM_JOB_NAME
 cp networks/[A-Za-z]*.py ./backup/$SLURM_JOB_NAME
-python train.py --model_name $SLURM_JOB_NAME
-
+# python train.py --model_name $SLURM_JOB_NAME
+python train.py --model_name $SLURM_JOB_NAME --load_weights_folder ./checkpoints/self_001_pretrain/models/weights_24 
+# finetuned_24_100
 # python eval_uap3.py --source_model 1 --target_model 2
 # python eval_uap3.py --source_model 1 --target_model 3
 # python eval_uap3.py --source_model 1 --target_model 4

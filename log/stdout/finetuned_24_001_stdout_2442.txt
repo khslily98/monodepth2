@@ -1,0 +1,31 @@
+loading model from folder ./checkpoints/self_001/models/weights_24
+Loading encoder weights...
+Loading depth weights...
+Loading pose_encoder weights...
+Loading pose weights...
+Loading Adam weights
+Training model named:
+   finetuned_24_001
+Models and tensorboard events files are saved to:
+   /mnt/server4_hard1/heeseon/monodepth2/checkpoints
+Training is using:
+   cuda
+Using split:
+   eigen_zhou
+There are 39810 training items and 4424 validation items
+
+Training
+epoch   0 | batch      0 | examples/s:   2.0 | loss: 0.08250 | time elapsed: 00h00m55s | time left: 00h00m00s
+epoch   0 | batch    250 | examples/s:  27.7 | loss: 0.06903 | time elapsed: 00h07m49s | time left: 43h06m33s
+epoch   0 | batch    500 | examples/s:  25.0 | loss: 0.07057 | time elapsed: 00h14m58s | time left: 41h07m34s
+epoch   0 | batch    750 | examples/s:  18.4 | loss: 0.06604 | time elapsed: 00h22m04s | time left: 40h18m20s
+epoch   0 | batch   1000 | examples/s:  26.8 | loss: 0.07380 | time elapsed: 00h29m15s | time left: 39h57m39s
+epoch   0 | batch   1250 | examples/s:  26.4 | loss: 0.06811 | time elapsed: 00h36m01s | time left: 39h13m59s
+epoch   0 | batch   1500 | examples/s:  25.4 | loss: 0.06683 | time elapsed: 00h43m06s | time left: 38h59m43s
+epoch   0 | batch   1750 | examples/s:  31.2 | loss: 0.06910 | time elapsed: 00h50m07s | time left: 38h45m09s
+epoch   0 | batch   2000 | examples/s:  19.3 | loss: 0.07308 | time elapsed: 00h57m16s | time left: 38h37m48s
+Training
+epoch   1 | batch    683 | examples/s:  20.7 | loss: 0.07149 | time elapsed: 01h53m26s | time left: 37h18m11s
+epoch   1 | batch   2683 | examples/s:  27.8 | loss: 0.07705 | time elapsed: 02h49m58s | time left: 36h19m18s
+Training
+epoch   2 | batch   1366 | examples/s:  27.5 | loss: 0.07226 | time elapsed: 03h46m06s | time left: 35h17m37s

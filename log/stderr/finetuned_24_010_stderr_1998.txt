@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "train.py", line 9, in <module>
+    from trainer import Trainer
+  File "/mnt/server4_hard1/heeseon/monodepth2/trainer.py", line 26, in <module>
+    from IPython import embed
+ModuleNotFoundError: No module named 'IPython'
