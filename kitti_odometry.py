@@ -632,3 +632,6 @@ class KittiEvalOdom():
             print("{0:.3f}".format(seq_rpe_rot[i] * 180 / np.pi))
             print("For Copy")
             print(f"{ave_t_errs[i]*100:0.3f},{ave_r_errs[i]/np.pi*180*100:0.3f},{seq_ate[i]:0.3f},{seq_rpe_trans[i]:0.3f},{seq_rpe_rot[i]*180/np.pi:0.3f}")
+            
+            
+        return ave_t_errs[i]*100, ave_r_errs[i]/np.pi*180*100

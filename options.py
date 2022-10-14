@@ -185,8 +185,8 @@ class MonodepthOptions:
         self.parser.add_argument("--eval_split",
                                  type=str,
                                  default="eigen",
-                                 choices=[
-                                    "eigen", "eigen_benchmark", "benchmark", "odom_9", "odom_10"],
+                              #    choices=[
+                              #       "eigen", "eigen_benchmark", "benchmark", "odom_9", "odom_10"],
                                  help="which split to run eval on")
         self.parser.add_argument("--save_pred_disps",
                                  help="if set saves predicted disparities",
@@ -205,7 +205,14 @@ class MonodepthOptions:
                                  help="if set will perform the flipping post processing "
                                       "from the original monodepth paper",
                                  action="store_true")
-
+        self.parser.add_argument("--model_name",
+                                 type=str,
+                                 default="model",
+                                 help="model_name")
+        self.parser.add_argument("--weight_name",
+                                 type=str,
+                                 default="weight",
+                                 help="weight")
     def parse(self):
         self.options = self.parser.parse_args()
         return self.options
