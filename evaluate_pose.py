@@ -72,8 +72,8 @@ def evaluate(opt):
     assert os.path.isdir(opt.load_weights_folder), \
         "Cannot find a folder at {}".format(opt.load_weights_folder)
 
-    assert opt.eval_split == "odom_9" or opt.eval_split == "odom_10", \
-        "eval_split should be either odom_9 or odom_10"
+    # assert opt.eval_split == "odom_9" or opt.eval_split == "odom_10", \
+    #     "eval_split should be either odom_9 or odom_10"
 
     opt = load_training_option(opt)
     sequence_id = int(opt.eval_split.split("_")[1])
@@ -133,7 +133,7 @@ def evaluate(opt):
     gt_poses_path = os.path.join(opt.data_path, "poses")
 
     eval_tool = KittiEvalOdom()
-    eval_tool.eval(gt_poses_path, opt.load_weights_folder, alignment='scale', seqs=[sequence_id], plot=True)
+    T_err, R_err = eval_tool.eval(gt_poses_path, opt.load_weights_folder, alignment='scale', seqs=[sequence_id], plot=True)
 
     gt_poses_path = os.path.join(opt.data_path, "poses", "{:02d}.txt".format(sequence_id))
     gt_global_poses = np.loadtxt(gt_poses_path).reshape(-1, 3, 4)
@@ -157,7 +157,21 @@ def evaluate(opt):
         ates.append(compute_ate(gt_local_xyzs, local_xyzs))
 
     print("\n   Trajectory error: {:0.3f}, std: {:0.3f}\n".format(np.mean(ates), np.std(ates)))
+    return T_err, R_err
 
 if __name__ == "__main__":
     options = MonodepthOptions()
-    evaluate(options.parse())
+    opt = options.parse()
+    odom_sq_list = ['odom_0', 'odom_3', 'odom_4', 'odom_5', 'odom_7','odom_9','odom_10']
+    # odom_sq_list = ['odom_3', 'odom_4']
+    result = {}
+    for odom_sq in odom_sq_list:
+        opt.eval_split = odom_sq
+        T_err, R_err = evaluate(opt)
+        result[odom_sq,"T_err"] = T_err
+        result[odom_sq,"R_err"] = R_err
+    print("###############Final Result#######################")  
+    print(opt.model_name, opt.weight_name, end=", ")  
+    for odom_sq in odom_sq_list:
+        
+        print("{0:.3f}".format(result[odom_sq,"T_err"]), ", ", "{0:.3f}".format(result[odom_sq,"R_err"]), end=", ")
